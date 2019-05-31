@@ -19,33 +19,36 @@ BUILD_DIR = build
 ######################################
 # C sources
 C_SOURCES =  \
-Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_flash.c \
-Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_pwr.c \
-Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc.c \
-Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim.c \
-Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_tim_ex.c \
-Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio_ex.c \
-Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_adc_ex.c \
-Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_cortex.c \
-Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_flash_ex.c \
-Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_gpio.c \
-Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_rcc_ex.c \
-Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c \
-Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_adc.c \
-Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_uart.c \
-Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_i2c.c \
-Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal_dma.c \
-Src/system_stm32f1xx.c \
+Drivers/AT32F4xx_HAL_Driver/Src/at32f4xx_hal_flash.c \
+Drivers/AT32F4xx_HAL_Driver/Src/at32f4xx_hal_flash_ex.c \
+Drivers/AT32F4xx_HAL_Driver/Src/at32f4xx_hal_rcc.c \
+Drivers/AT32F4xx_HAL_Driver/Src/at32f4xx_hal_tim.c \
+Drivers/AT32F4xx_HAL_Driver/Src/at32f4xx_hal_tim_ex.c \
+Drivers/AT32F4xx_HAL_Driver/Src/at32f4xx_hal_gpio_ex.c \
+Drivers/AT32F4xx_HAL_Driver/Src/at32f4xx_hal_adc_ex.c \
+Drivers/AT32F4xx_HAL_Driver/Src/at32f4xx_hal_cortex.c \
+Drivers/AT32F4xx_HAL_Driver/Src/at32f4xx_hal_gpio.c \
+Drivers/AT32F4xx_HAL_Driver/Src/at32f4xx_hal_rcc_ex.c \
+Drivers/AT32F4xx_HAL_Driver/Src/at32f4xx_hal_pwr.c \
+Drivers/AT32F4xx_HAL_Driver/Src/at32f4xx_hal.c \
+Drivers/AT32F4xx_HAL_Driver/Src/at32f4xx_hal_adc.c \
+Drivers/AT32F4xx_HAL_Driver/Src/at32f4xx_hal_uart.c \
+Drivers/AT32F4xx_HAL_Driver/Src/at32f4xx_hal_i2c.c \
+Drivers/AT32F4xx_HAL_Driver/Src/at32f4xx_hal_dma.c \
+Src/system_at32f4xx.c \
 Src/setup.c \
 Src/control.c \
 Src/main.c \
 Src/bldc.c \
 Src/comms.c \
-Src/stm32f1xx_it.c \
+Src/at32f4xx_it.c \
+
+
+
 
 # ASM sources
 ASM_SOURCES =  \
-startup_stm32f103xe.s
+startup_at32f403xe.s
 
 #######################################
 # binaries
@@ -63,13 +66,13 @@ BIN = $(CP) -O binary -S
 # CFLAGS
 #######################################
 # cpu
-CPU = -mcpu=cortex-m3
+CPU = -mcpu=cortex-m4
 
 # fpu
 # NONE for Cortex-M0/M0+/M3
-
+FPU=-mfpu=fpv4-sp-d16
 # float-abi
-
+FLOAT-ABI=-mfloat-abi=softfp
 
 # mcu
 MCU = $(CPU) -mthumb $(FPU) $(FLOAT-ABI)
@@ -81,7 +84,7 @@ AS_DEFS =
 # C defines
 C_DEFS =  \
 -DUSE_HAL_DRIVER \
--DSTM32F103xE
+-DAT32F403Rx_HD
 
 
 # AS includes
@@ -90,10 +93,10 @@ AS_INCLUDES =
 # C includes
 C_INCLUDES =  \
 -IInc \
--IDrivers/STM32F1xx_HAL_Driver/Inc \
--IDrivers/STM32F1xx_HAL_Driver/Inc/Legacy \
--IDrivers/CMSIS/Device/ST/STM32F1xx/Include \
--IDrivers/CMSIS/Include
+-IDrivers/AT32F4xx_HAL_Driver/Inc \
+-IDrivers/AT32F4xx_StdPeriph_Driver/Inc \
+-IDrivers/CMSIS/CM4/DeviceSupport \
+-IDrivers/CMSIS/CM4/CoreSupport \
 
 
 # compile gcc flags
@@ -114,7 +117,7 @@ CFLAGS += -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)"
 # LDFLAGS
 #######################################
 # link script
-LDSCRIPT = STM32F103RCTx_FLASH.ld
+LDSCRIPT = AT32F403RCTx_FLASH.ld
 
 # libraries
 LIBS = -lc -lm -lnosys
@@ -136,7 +139,7 @@ OBJECTS += $(addprefix $(BUILD_DIR)/,$(notdir $(ASM_SOURCES:.s=.o)))
 vpath %.s $(sort $(dir $(ASM_SOURCES)))
 
 $(BUILD_DIR)/%.o: %.c Inc/config.h Makefile | $(BUILD_DIR)
-	$(CC) -c $(CFLAGS) -Wa,-a,-ad,-alms=$(BUILD_DIR)/$(notdir $(<:.c=.lst)) $< -o $@
+	$(CC) -c $(CFLAGS) -Wa,-a,-ad,-alms=$(BUILD_DIR)/$(notdir $(<:.c=.lst)) $< -o $@ -include Inc/at32f4xx_conf.h
 
 $(BUILD_DIR)/%.o: %.s Inc/config.h Makefile | $(BUILD_DIR)
 	$(AS) -c $(CFLAGS) $< -o $@
@@ -164,6 +167,9 @@ clean:
 
 flash:
 	st-flash --reset write $(BUILD_DIR)/$(TARGET).bin 0x8000000
+
+flash-jlink:
+	 JLink.exe -if swd -device Cortex-M4 -speed 4000 -SettingsFile .\JLinkSettings.ini -CommanderScript jlink-command.jlink
 
 unlock:
 	openocd -f interface/stlink-v2.cfg -f target/stm32f1x.cfg -c init -c "reset halt" -c "stm32f1x unlock 0"

@@ -1,5 +1,5 @@
 #pragma once
-#include "stm32f1xx_hal.h"
+#include "at32f4xx_hal.h"
 
 // ############################### DO-NOT-TOUCH SETTINGS ###############################
 

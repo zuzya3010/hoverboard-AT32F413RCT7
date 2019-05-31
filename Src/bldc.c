@@ -1,5 +1,5 @@
 
-#include "stm32f1xx_hal.h"
+#include "at32f4xx_hal.h"
 #include "defines.h"
 #include "setup.h"
 #include "config.h"
@@ -23,6 +23,7 @@ uint32_t buzzerPattern = 0;
 
 uint8_t enable = 0;
 
+//TODO: Is this the MCLK?
 const int pwm_res = 64000000 / 2 / PWM_FREQ; // = 2000
 
 const uint8_t hall_to_pos[8] = {
