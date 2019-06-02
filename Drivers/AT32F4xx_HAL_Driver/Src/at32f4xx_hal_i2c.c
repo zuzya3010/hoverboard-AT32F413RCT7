@@ -246,7 +246,7 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
-#include "at2f4xx_hal.h"
+#include "at32f4xx_hal.h"
 
 /** @addtogroup STM32F1xx_HAL_Driver
   * @{

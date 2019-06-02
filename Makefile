@@ -94,10 +94,10 @@ AS_INCLUDES =
 C_INCLUDES =  \
 -IInc \
 -IDrivers/AT32F4xx_HAL_Driver/Inc \
--IDrivers/AT32F4xx_StdPeriph_Driver/Inc \
 -IDrivers/CMSIS/CM4/DeviceSupport \
 -IDrivers/CMSIS/CM4/CoreSupport \
 
+#-IDrivers/AT32F4xx_StdPeriph_Driver/Inc \
 
 # compile gcc flags
 ASFLAGS = $(MCU) $(AS_DEFS) $(AS_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections

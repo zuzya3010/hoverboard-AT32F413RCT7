@@ -14,7 +14,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 /* Uncomment/Comment the line below to enable/disable peripheral header file inclusion */
-#include "at32f4xx_adc.h"
+/*#include "at32f4xx_adc.h"
 #include "at32f4xx_bkp.h"
 #include "at32f4xx_can.h"
 #include "at32f4xx_crc.h"
@@ -35,7 +35,7 @@
 #include "at32f4xx_tim.h"
 #include "at32f4xx_usart.h"
 #include "at32f4xx_wwdg.h"
-#include "misc.h" /* High level functions for NVIC and SysTick (add-on to CMSIS functions) */
+#include "misc.h" *//* High level functions for NVIC and SysTick (add-on to CMSIS functions) */
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/

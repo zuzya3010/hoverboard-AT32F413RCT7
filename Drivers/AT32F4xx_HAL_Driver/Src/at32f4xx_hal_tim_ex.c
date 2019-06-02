@@ -461,9 +461,9 @@ HAL_StatusTypeDef HAL_TIMEx_HallSensor_Stop_DMA(TIM_HandleTypeDef *htim)
   * @}
   */
 
-#if defined (STM32F100xB) || defined (STM32F100xE) ||                                                   \
-    defined (STM32F103x6) || defined (STM32F103xB) || defined (STM32F103xE) || defined (STM32F103xG) || \
-    defined (STM32F105xC) || defined (STM32F107xC)
+// #if defined (STM32F100xB) || defined (STM32F100xE) ||                                                   \
+    // defined (STM32F103x6) || defined (STM32F103xB) || defined (STM32F103xE) || defined (STM32F103xG) || \
+    // defined (STM32F105xC) || defined (STM32F107xC)
 
 /** @defgroup TIMEx_Exported_Functions_Group2 Timer Complementary Output Compare functions
  *  @brief    Timer Complementary Output Compare functions
@@ -1430,7 +1430,7 @@ HAL_StatusTypeDef HAL_TIMEx_OnePulseN_Stop_IT(TIM_HandleTypeDef *htim, uint32_t 
   * @}
   */
 
-#endif /* defined(STM32F100xB) || defined(STM32F100xE) ||                                                 */
+// #endif /* defined(STM32F100xB) || defined(STM32F100xE) ||                                                 */
        /* defined(STM32F103x6) || defined(STM32F103xB) || defined(STM32F103xE) || defined(STM32F103xG) || */
        /* defined(STM32F105xC) || defined(STM32F107xC)                                                    */
 
@@ -1451,9 +1451,9 @@ HAL_StatusTypeDef HAL_TIMEx_OnePulseN_Stop_IT(TIM_HandleTypeDef *htim, uint32_t 
   * @{
   */
 
-#if defined (STM32F100xB) || defined (STM32F100xE) ||                                                   \
-    defined (STM32F103x6) || defined (STM32F103xB) || defined (STM32F103xE) || defined (STM32F103xG) || \
-    defined (STM32F105xC) || defined (STM32F107xC)
+// #if defined (STM32F100xB) || defined (STM32F100xE) ||                                                   \
+    // defined (STM32F103x6) || defined (STM32F103xB) || defined (STM32F103xE) || defined (STM32F103xG) || \
+    // defined (STM32F105xC) || defined (STM32F107xC)
 
 /**
   * @brief  Configure the TIM commutation event sequence.
@@ -1662,7 +1662,7 @@ HAL_StatusTypeDef HAL_TIMEx_ConfigBreakDeadTime(TIM_HandleTypeDef *htim,
   return HAL_OK;
 }
 
-#endif /* defined(STM32F100xB) || defined(STM32F100xE) ||                                                 */
+// #endif /* defined(STM32F100xB) || defined(STM32F100xE) ||                                                 */
        /* defined(STM32F103x6) || defined(STM32F103xB) || defined(STM32F103xE) || defined(STM32F103xG) || */
        /* defined(STM32F105xC) || defined(STM32F107xC)                                                    */
 
@@ -1768,9 +1768,9 @@ void TIMEx_DMACommutationCplt(DMA_HandleTypeDef *hdma)
   * @}
   */
 
-#if defined (STM32F100xB) || defined (STM32F100xE) ||                                                   \
-    defined (STM32F103x6) || defined (STM32F103xB) || defined (STM32F103xE) || defined (STM32F103xG) || \
-    defined (STM32F105xC) || defined (STM32F107xC)
+// #if defined (STM32F100xB) || defined (STM32F100xE) ||                                                   \
+    // defined (STM32F103x6) || defined (STM32F103xB) || defined (STM32F103xE) || defined (STM32F103xG) || \
+    // defined (STM32F105xC) || defined (STM32F107xC)
 
 /** @defgroup TIMEx_Exported_Functions_Group7 Extension Peripheral State functions
  *  @brief   Extension Peripheral State functions
@@ -1800,7 +1800,7 @@ HAL_TIM_StateTypeDef HAL_TIMEx_HallSensor_GetState(TIM_HandleTypeDef *htim)
 /**
   * @}
   */
-#endif /* defined(STM32F100xB) || defined(STM32F100xE) ||                                                 */
+// #endif /* defined(STM32F100xB) || defined(STM32F100xE) ||                                                 */
        /* defined(STM32F103x6) || defined(STM32F103xB) || defined(STM32F103xE) || defined(STM32F103xG) || */
        /* defined(STM32F105xC) || defined(STM32F107xC)                                                    */
 
@@ -1808,9 +1808,9 @@ HAL_TIM_StateTypeDef HAL_TIMEx_HallSensor_GetState(TIM_HandleTypeDef *htim)
   * @}
   */
 
-#if defined (STM32F100xB) || defined (STM32F100xE) ||                                                   \
-    defined (STM32F103x6) || defined (STM32F103xB) || defined (STM32F103xE) || defined (STM32F103xG) || \
-    defined (STM32F105xC) || defined (STM32F107xC)
+// #if defined (STM32F100xB) || defined (STM32F100xE) ||                                                   \
+    // defined (STM32F103x6) || defined (STM32F103xB) || defined (STM32F103xE) || defined (STM32F103xG) || \
+    // defined (STM32F105xC) || defined (STM32F107xC)
 
 /** @addtogroup TIMEx_Private_Functions
   * @{
@@ -1845,7 +1845,7 @@ static void TIM_CCxNChannelCmd(TIM_TypeDef* TIMx, uint32_t Channel, uint32_t Cha
   * @}
   */
 
-#endif /* defined(STM32F100xB) || defined(STM32F100xE) ||                                                 */
+// #endif /* defined(STM32F100xB) || defined(STM32F100xE) ||                                                 */
        /* defined(STM32F103x6) || defined(STM32F103xB) || defined(STM32F103xE) || defined(STM32F103xG) || */
        /* defined(STM32F105xC) || defined(STM32F107xC)                                                    */
 

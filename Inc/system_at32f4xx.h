@@ -48,8 +48,18 @@ extern uint32_t SystemCoreClock;          /*!< System Clock Frequency (Core Cloc
 /** @addtogroup AT32F4xx_System_Exported_Constants
   * @{
   */
-extern const uint8_t  AHBPrescTable[16U];  /*!< AHB prescalers table values */
-extern const uint8_t  APBPrescTable[8U];   /*!< APB prescalers table values */
+extern __I uint8_t  AHBPrescTable[16U];  /*!< AHB prescalers table values */
+extern __I uint8_t  APBPrescTable[8U];   /*!< APB prescalers table values */
+
+
+#define RCC_PLLRefClk_HSI_Div2          ((uint32_t)0x00000000)
+
+#define RCC_PLLRefClk_HSE_Div1          ((uint32_t)0x00010000)
+#define RCC_PLLRefClk_HSE_Div2          ((uint32_t)0x00030000)
+#define IS_RCC_PLL_CFG(CFG)             (((CFG) == RCC_PLLRefClk_HSI_Div2) || \
+                                         ((CFG) == RCC_PLLRefClk_HSE_Div1) || \
+                                         ((CFG) == RCC_PLLRefClk_HSE_Div2))
+
 /**
   * @}
   */

@@ -556,25 +556,25 @@ typedef struct
 
 // #if defined(STM32F105xC) || defined(STM32F107xC)
 // #else
-// #define RCC_PLL_MUL2                    RCC_CFGR_PLLMULL2
-// #define RCC_PLL_MUL3                    RCC_CFGR_PLLMULL3
+#define RCC_PLL_MUL2                    RCC_CFGR_PLLMULL2
+#define RCC_PLL_MUL3                    RCC_CFGR_PLLMULL3
 // #endif /* STM32F105xC || STM32F107xC */
-// #define RCC_PLL_MUL4                    RCC_CFGR_PLLMULL4
-// #define RCC_PLL_MUL5                    RCC_CFGR_PLLMULL5
-// #define RCC_PLL_MUL6                    RCC_CFGR_PLLMULL6
-// #define RCC_PLL_MUL7                    RCC_CFGR_PLLMULL7
-// #define RCC_PLL_MUL8                    RCC_CFGR_PLLMULL8
-// #define RCC_PLL_MUL9                    RCC_CFGR_PLLMULL9
+#define RCC_PLL_MUL4                    RCC_CFGR_PLLMULL4
+#define RCC_PLL_MUL5                    RCC_CFGR_PLLMULL5
+#define RCC_PLL_MUL6                    RCC_CFGR_PLLMULL6
+#define RCC_PLL_MUL7                    RCC_CFGR_PLLMULL7
+#define RCC_PLL_MUL8                    RCC_CFGR_PLLMULL8
+#define RCC_PLL_MUL9                    RCC_CFGR_PLLMULL9
 // #if defined(STM32F105xC) || defined(STM32F107xC)
 // #define RCC_PLL_MUL6_5                  RCC_CFGR_PLLMULL6_5
 // #else
-// #define RCC_PLL_MUL10                   RCC_CFGR_PLLMULL10
-// #define RCC_PLL_MUL11                   RCC_CFGR_PLLMULL11
-// #define RCC_PLL_MUL12                   RCC_CFGR_PLLMULL12
-// #define RCC_PLL_MUL13                   RCC_CFGR_PLLMULL13
-// #define RCC_PLL_MUL14                   RCC_CFGR_PLLMULL14
-// #define RCC_PLL_MUL15                   RCC_CFGR_PLLMULL15
-// #define RCC_PLL_MUL16                   RCC_CFGR_PLLMULL16
+#define RCC_PLL_MUL10                   RCC_CFGR_PLLMULL10
+#define RCC_PLL_MUL11                   RCC_CFGR_PLLMULL11
+#define RCC_PLL_MUL12                   RCC_CFGR_PLLMULL12
+#define RCC_PLL_MUL13                   RCC_CFGR_PLLMULL13
+#define RCC_PLL_MUL14                   RCC_CFGR_PLLMULL14
+#define RCC_PLL_MUL15                   RCC_CFGR_PLLMULL15
+#define RCC_PLL_MUL16                   RCC_CFGR_PLLMULL16
 // #endif /* STM32F105xC || STM32F107xC */
 
 /**
@@ -598,7 +598,7 @@ typedef struct
 /**
   * @}
   */
-
+	
 // #if defined(STM32F105xC) || defined(STM32F107xC)
 // /** @defgroup RCCEx_Interrupt RCCEx Interrupt
   // * @{
@@ -1616,8 +1616,8 @@ typedef struct
   // * @param  __HSE_PREDIV_VALUE__ specifies the division value applied to HSE.
   // *         This parameter must be a number between RCC_HSE_PREDIV_DIV1 and RCC_HSE_PREDIV_DIV2.
   // */
-// #define __HAL_RCC_HSE_PREDIV_CONFIG(__HSE_PREDIV_VALUE__) \
-                  // MODIFY_REG(RCC->CFGR,RCC_CFGR_PLLXTPRE, (uint32_t)(__HSE_PREDIV_VALUE__))
+ #define __HAL_RCC_HSE_PREDIV_CONFIG(__HSE_PREDIV_VALUE__) \
+                   MODIFY_REG(RCC->CFGR,RCC_CFGR_PLLXTPRE, (uint32_t)(__HSE_PREDIV_VALUE__))
 
 // #endif /* STM32F105xC || STM32F107xC */
 

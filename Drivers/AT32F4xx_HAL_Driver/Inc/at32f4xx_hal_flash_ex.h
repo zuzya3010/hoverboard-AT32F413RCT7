@@ -46,6 +46,17 @@
 /* Includes ------------------------------------------------------------------*/
 #include "at32f4xx_hal_def.h"
 
+
+  //copied from at32f4xx_flash.h as we cannot include them
+typedef enum
+{
+    FLASH_BSY = 1,
+    FLASH_PGRM_FLR,
+    FLASH_WRPRT_FLR,
+    FLASH_PRC_DONE,
+    FLASH_TIMEOUT
+} FLASH_Status;
+
 /** @addtogroup STM32F1xx_HAL_Driver
   * @{
   */
