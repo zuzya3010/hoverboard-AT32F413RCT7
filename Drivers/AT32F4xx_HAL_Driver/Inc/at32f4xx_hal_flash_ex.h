@@ -437,7 +437,7 @@ typedef struct
 #define OB_WRP_PAGES16TO31MASK         0x0000FF00U
 #define OB_WRP_PAGES32TO47MASK         0x00FF0000U
 // #define OB_WRP_PAGES48TO255MASK        0xFF000000U
-#endif /* STM32F100xE || STM32F101xE || STM32F103xE */
+// #endif /* STM32F100xE || STM32F101xE || STM32F103xE */
 
 /* XL Density */
 // #if  defined(STM32F101xG) || defined(STM32F103xG) 
