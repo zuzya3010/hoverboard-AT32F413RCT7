@@ -340,6 +340,7 @@ extern "C" {
 
 
 /* Exported macro ------------------------------------------------------------*/
+#ifndef assert_param(expr)
 #ifdef USE_FULL_ASSERT
 /**
   * @brief  The assert_param macro is used for function's parameters check.
@@ -355,7 +356,7 @@ void assert_failed(uint8_t *file, uint32_t line);
 #else
 #define assert_param(expr) ((void)0U)
 #endif /* USE_FULL_ASSERT */
-
+#endif
 #ifdef __cplusplus
 }
 #endif

@@ -2644,7 +2644,9 @@ typedef struct
 
 /*****************  Bit definition for RCC_APB1EN register  ******************/
 #define  RCC_APB1EN_TMR2EN                      ((uint32_t)0x00000001)        /*!< Timer 2 clock enabled*/
+#define  RCC_APB1ENR_TIM2EN 					RCC_APB1EN_TMR2EN
 #define  RCC_APB1EN_TMR3EN                      ((uint32_t)0x00000002)        /*!< Timer 3 clock enable */
+#define  RCC_APB1ENR_TIM3EN						RCC_APB1EN_TMR3EN
 #define  RCC_APB1EN_WWDGEN                      ((uint32_t)0x00000800)        /*!< Window Watchdog clock enable */
 #define  RCC_APB1EN_USART2EN                    ((uint32_t)0x00020000)        /*!< USART 2 clock enable */
 #define  RCC_APB1EN_I2C1EN                      ((uint32_t)0x00200000)        /*!< I2C 1 clock enable */
