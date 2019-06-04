@@ -40,6 +40,8 @@
 #ifndef __AT32F4xx_HAL_H
 #define __AT32F4xx_HAL_H
 
+#pragma GCC diagnostic ignored "-Wcomment"
+
 #ifdef __cplusplus
  extern "C" {
 #endif

@@ -96,22 +96,22 @@ extern "C" {
   *        This value is used by the RCC HAL module to compute the system frequency
   *        (when HSE is used as system clock source, directly or through the PLL).
   */
-#if !defined(HSE_VALUE)
-#define HSE_VALUE ((uint32_t)8000000) /*!< Value of the External oscillator in Hz */
-#endif /* HSE_VALUE */
+// #if !defined(HSE_VALUE)
+// #define HSE_VALUE ((uint32_t)8000000) /*!< Value of the External oscillator in Hz */
+// #endif /* HSE_VALUE */
 
-#if !defined(HSE_STARTUP_TIMEOUT)
-#define HSE_STARTUP_TIMEOUT ((uint32_t)100) /*!< Time out for HSE start up, in ms */
-#endif /* HSE_STARTUP_TIMEOUT */
+// #if !defined(HSE_STARTUP_TIMEOUT)
+// #define HSE_STARTUP_TIMEOUT ((uint16_t)0x0500) /*!< Time out for HSE start up, in ms */
+// #endif /* HSE_STARTUP_TIMEOUT */
 
 /**
   * @brief Internal High Speed oscillator (HSI) value.
   *        This value is used by the RCC HAL module to compute the system frequency
   *        (when HSI is used as system clock source, directly or through the PLL).
   */
-#if !defined(HSI_VALUE)
-#define HSI_VALUE ((uint32_t)8000000) /*!< Value of the Internal oscillator in Hz*/
-#endif /* HSI_VALUE */
+// #if !defined(HSI_VALUE)
+// #define HSI_VALUE ((uint32_t)8000000) /*!< Value of the Internal oscillator in Hz*/
+// #endif /* HSI_VALUE */
 
 /**
   * @brief Internal Low Speed oscillator (LSI) value.
@@ -341,6 +341,7 @@ extern "C" {
 
 /* Exported macro ------------------------------------------------------------*/
 #ifdef USE_FULL_ASSERT
+#ifndef asser_param(expr)
 /**
   * @brief  The assert_param macro is used for function's parameters check.
   * @param  expr: If expr is false, it calls assert_failed function
@@ -354,6 +355,7 @@ extern "C" {
 void assert_failed(uint8_t *file, uint32_t line);
 #else
 #define assert_param(expr) ((void)0U)
+#endif
 #endif /* USE_FULL_ASSERT */
 
 #ifdef __cplusplus

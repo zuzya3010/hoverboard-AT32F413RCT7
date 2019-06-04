@@ -132,8 +132,8 @@ typedef struct
   * @{
   */
 #define RCC_HSE_OFF                      0x00000000U                                /*!< HSE clock deactivation */
-#define RCC_HSE_ON                       RCC_CR_HSEON                               /*!< HSE clock activation */
-#define RCC_HSE_BYPASS                   ((uint32_t)(RCC_CR_HSEBYP | RCC_CR_HSEON)) /*!< External clock source for HSE clock */
+#define RCC_HSE_ON                       0x00010000U                               /*!< HSE clock activation */
+#define RCC_HSE_BYPASS                   0x00040000U /*!< External clock source for HSE clock */
 /**
   * @}
   */
@@ -219,15 +219,15 @@ typedef struct
 /** @defgroup RCC_AHB_Clock_Source AHB Clock Source
   * @{
   */
-#define RCC_SYSCLK_DIV1                  RCC_CFGR_HPRE_DIV1   /*!< SYSCLK not divided */
-#define RCC_SYSCLK_DIV2                  RCC_CFGR_HPRE_DIV2   /*!< SYSCLK divided by 2 */
-#define RCC_SYSCLK_DIV4                  RCC_CFGR_HPRE_DIV4   /*!< SYSCLK divided by 4 */
-#define RCC_SYSCLK_DIV8                  RCC_CFGR_HPRE_DIV8   /*!< SYSCLK divided by 8 */
-#define RCC_SYSCLK_DIV16                 RCC_CFGR_HPRE_DIV16  /*!< SYSCLK divided by 16 */
-#define RCC_SYSCLK_DIV64                 RCC_CFGR_HPRE_DIV64  /*!< SYSCLK divided by 64 */
-#define RCC_SYSCLK_DIV128                RCC_CFGR_HPRE_DIV128 /*!< SYSCLK divided by 128 */
-#define RCC_SYSCLK_DIV256                RCC_CFGR_HPRE_DIV256 /*!< SYSCLK divided by 256 */
-#define RCC_SYSCLK_DIV512                RCC_CFGR_HPRE_DIV512 /*!< SYSCLK divided by 512 */
+#define RCC_SYSCLK_DIV1                 ((uint32_t)0x00000000)
+#define RCC_SYSCLK_DIV2                 ((uint32_t)0x00000080)
+#define RCC_SYSCLK_DIV4                 ((uint32_t)0x00000090)
+#define RCC_SYSCLK_DIV8                 ((uint32_t)0x000000A0)
+#define RCC_SYSCLK_DIV16                ((uint32_t)0x000000B0)
+#define RCC_SYSCLK_DIV64                ((uint32_t)0x000000C0)
+#define RCC_SYSCLK_DIV128               ((uint32_t)0x000000D0)
+#define RCC_SYSCLK_DIV256               ((uint32_t)0x000000E0)
+#define RCC_SYSCLK_DIV512               ((uint32_t)0x000000F0)
 
 /**
   * @}
@@ -236,11 +236,11 @@ typedef struct
 /** @defgroup RCC_APB1_APB2_Clock_Source APB1 APB2 Clock Source
   * @{
   */
-#define RCC_HCLK_DIV1                    RCC_CFGR_PPRE1_DIV1  /*!< HCLK not divided */
-#define RCC_HCLK_DIV2                    RCC_CFGR_PPRE1_DIV2  /*!< HCLK divided by 2 */
-#define RCC_HCLK_DIV4                    RCC_CFGR_PPRE1_DIV4  /*!< HCLK divided by 4 */
-#define RCC_HCLK_DIV8                    RCC_CFGR_PPRE1_DIV8  /*!< HCLK divided by 8 */
-#define RCC_HCLK_DIV16                   RCC_CFGR_PPRE1_DIV16 /*!< HCLK divided by 16 */
+#define RCC_HCLK_DIV1                    ((uint32_t)0x00000000)  /*!< HCLK not divided */
+#define RCC_HCLK_DIV2                    ((uint32_t)0x00000400)  /*!< HCLK divided by 2 */
+#define RCC_HCLK_DIV4                    ((uint32_t)0x00000500)  /*!< HCLK divided by 4 */
+#define RCC_HCLK_DIV8                    ((uint32_t)0x00000600)  /*!< HCLK divided by 8 */
+#define RCC_HCLK_DIV16                   ((uint32_t)0x00000700) /*!< HCLK divided by 16 */
 
 /**
   * @}
@@ -280,12 +280,12 @@ typedef struct
 /** @defgroup RCC_Interrupt Interrupts
   * @{
   */
-#define RCC_IT_LSIRDY                    ((uint8_t)RCC_CIR_LSIRDYF)   /*!< LSI Ready Interrupt flag */
-#define RCC_IT_LSERDY                    ((uint8_t)RCC_CIR_LSERDYF)   /*!< LSE Ready Interrupt flag */
-#define RCC_IT_HSIRDY                    ((uint8_t)RCC_CIR_HSIRDYF)   /*!< HSI Ready Interrupt flag */
-#define RCC_IT_HSERDY                    ((uint8_t)RCC_CIR_HSERDYF)   /*!< HSE Ready Interrupt flag */
-#define RCC_IT_PLLRDY                    ((uint8_t)RCC_CIR_PLLRDYF)   /*!< PLL Ready Interrupt flag */
-#define RCC_IT_CSS                       ((uint8_t)RCC_CIR_CSSF)      /*!< Clock Security System Interrupt flag */
+#define RCC_IT_LSIRDY                    ((uint8_t)0x01)   /*!< LSI Ready Interrupt flag */
+#define RCC_IT_LSERDY                    ((uint8_t)0x02)   /*!< LSE Ready Interrupt flag */
+#define RCC_IT_HSIRDY                    ((uint8_t)0x04)   /*!< HSI Ready Interrupt flag */
+#define RCC_IT_HSERDY                    ((uint8_t)0x08)   /*!< HSE Ready Interrupt flag */
+#define RCC_IT_PLLRDY                    ((uint8_t)0x10)   /*!< PLL Ready Interrupt flag */
+#define RCC_IT_CSS                       ((uint8_t)0x80)      /*!< Clock Security System Interrupt flag */
 /**
   * @}
   */ 

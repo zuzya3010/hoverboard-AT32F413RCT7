@@ -2217,54 +2217,54 @@ typedef struct
 /******************  Bit definition for RCC_APB2ENR register  *****************/
 #define RCC_APB2ENR_AFIOEN_Pos               (0U)                              
 #define RCC_APB2ENR_AFIOEN_Msk               (0x1U << RCC_APB2ENR_AFIOEN_Pos)  /*!< 0x00000001 */
-#define RCC_APB2ENR_AFIOEN                   RCC_APB2ENR_AFIOEN_Msk            /*!< Alternate Function I/O clock enable */
+#define RCC_APB2ENR_AFIOEN                   RCC_APB2EN_AFIOEN            /*!< Alternate Function I/O clock enable */
 #define RCC_APB2ENR_IOPAEN_Pos               (2U)                              
 #define RCC_APB2ENR_IOPAEN_Msk               (0x1U << RCC_APB2ENR_IOPAEN_Pos)  /*!< 0x00000004 */
-#define RCC_APB2ENR_IOPAEN                   RCC_APB2ENR_IOPAEN_Msk            /*!< I/O port A clock enable */
+#define RCC_APB2ENR_IOPAEN                   RCC_APB2EN_GPIOAEN            /*!< I/O port A clock enable */
 #define RCC_APB2ENR_IOPBEN_Pos               (3U)                              
 #define RCC_APB2ENR_IOPBEN_Msk               (0x1U << RCC_APB2ENR_IOPBEN_Pos)  /*!< 0x00000008 */
-#define RCC_APB2ENR_IOPBEN                   RCC_APB2ENR_IOPBEN_Msk            /*!< I/O port B clock enable */
+#define RCC_APB2ENR_IOPBEN                   RCC_APB2EN_GPIOBEN            /*!< I/O port B clock enable */
 #define RCC_APB2ENR_IOPCEN_Pos               (4U)                              
 #define RCC_APB2ENR_IOPCEN_Msk               (0x1U << RCC_APB2ENR_IOPCEN_Pos)  /*!< 0x00000010 */
-#define RCC_APB2ENR_IOPCEN                   RCC_APB2ENR_IOPCEN_Msk            /*!< I/O port C clock enable */
+#define RCC_APB2ENR_IOPCEN                   RCC_APB2EN_GPIOCEN            /*!< I/O port C clock enable */
 #define RCC_APB2ENR_IOPDEN_Pos               (5U)                              
 #define RCC_APB2ENR_IOPDEN_Msk               (0x1U << RCC_APB2ENR_IOPDEN_Pos)  /*!< 0x00000020 */
-#define RCC_APB2ENR_IOPDEN                   RCC_APB2ENR_IOPDEN_Msk            /*!< I/O port D clock enable */
+#define RCC_APB2ENR_IOPDEN                   RCC_APB2EN_GPIODEN            /*!< I/O port D clock enable */
 #define RCC_APB2ENR_ADC1EN_Pos               (9U)                              
 #define RCC_APB2ENR_ADC1EN_Msk               (0x1U << RCC_APB2ENR_ADC1EN_Pos)  /*!< 0x00000200 */
-#define RCC_APB2ENR_ADC1EN                   RCC_APB2ENR_ADC1EN_Msk            /*!< ADC 1 interface clock enable */
+#define RCC_APB2ENR_ADC1EN                   RCC_APB2EN_ADC1EN            /*!< ADC 1 interface clock enable */
 
 #define RCC_APB2ENR_ADC2EN_Pos               (10U)                             
 #define RCC_APB2ENR_ADC2EN_Msk               (0x1U << RCC_APB2ENR_ADC2EN_Pos)  /*!< 0x00000400 */
-#define RCC_APB2ENR_ADC2EN                   RCC_APB2ENR_ADC2EN_Msk            /*!< ADC 2 interface clock enable */
+#define RCC_APB2ENR_ADC2EN                   RCC_APB2EN_ADC2EN            /*!< ADC 2 interface clock enable */
 
 #define RCC_APB2ENR_TIM1EN_Pos               (11U)                             
 #define RCC_APB2ENR_TIM1EN_Msk               (0x1U << RCC_APB2ENR_TIM1EN_Pos)  /*!< 0x00000800 */
-#define RCC_APB2ENR_TIM1EN                   RCC_APB2ENR_TIM1EN_Msk            /*!< TIM1 Timer clock enable */
+#define RCC_APB2ENR_TIM1EN                   RCC_APB2EN_TMR1EN            /*!< TIM1 Timer clock enable */
 #define RCC_APB2ENR_SPI1EN_Pos               (12U)                             
 #define RCC_APB2ENR_SPI1EN_Msk               (0x1U << RCC_APB2ENR_SPI1EN_Pos)  /*!< 0x00001000 */
-#define RCC_APB2ENR_SPI1EN                   RCC_APB2ENR_SPI1EN_Msk            /*!< SPI 1 clock enable */
+#define RCC_APB2ENR_SPI1EN                   RCC_APB2EN_SPI1EN            /*!< SPI 1 clock enable */
 #define RCC_APB2ENR_USART1EN_Pos             (14U)                             
 #define RCC_APB2ENR_USART1EN_Msk             (0x1U << RCC_APB2ENR_USART1EN_Pos) /*!< 0x00004000 */
-#define RCC_APB2ENR_USART1EN                 RCC_APB2ENR_USART1EN_Msk          /*!< USART1 clock enable */
+#define RCC_APB2ENR_USART1EN                 RCC_APB2EN_USART1EN          /*!< USART1 clock enable */
 
 
 #define RCC_APB2ENR_IOPEEN_Pos               (6U)                              
 #define RCC_APB2ENR_IOPEEN_Msk               (0x1U << RCC_APB2ENR_IOPEEN_Pos)  /*!< 0x00000040 */
-#define RCC_APB2ENR_IOPEEN                   RCC_APB2ENR_IOPEEN_Msk            /*!< I/O port E clock enable */
+#define RCC_APB2ENR_IOPEEN                   RCC_APB2EN_GPIOEEN            /*!< I/O port E clock enable */
 
 #define RCC_APB2ENR_IOPFEN_Pos               (7U)                              
 #define RCC_APB2ENR_IOPFEN_Msk               (0x1U << RCC_APB2ENR_IOPFEN_Pos)  /*!< 0x00000080 */
-#define RCC_APB2ENR_IOPFEN                   RCC_APB2ENR_IOPFEN_Msk            /*!< I/O port F clock enable */
+#define RCC_APB2ENR_IOPFEN                   RCC_APB2EN_GPIOFEN            /*!< I/O port F clock enable */
 #define RCC_APB2ENR_IOPGEN_Pos               (8U)                              
 #define RCC_APB2ENR_IOPGEN_Msk               (0x1U << RCC_APB2ENR_IOPGEN_Pos)  /*!< 0x00000100 */
-#define RCC_APB2ENR_IOPGEN                   RCC_APB2ENR_IOPGEN_Msk            /*!< I/O port G clock enable */
+#define RCC_APB2ENR_IOPGEN                   RCC_APB2EN_GPIOGEN            /*!< I/O port G clock enable */
 #define RCC_APB2ENR_TIM8EN_Pos               (13U)                             
 #define RCC_APB2ENR_TIM8EN_Msk               (0x1U << RCC_APB2ENR_TIM8EN_Pos)  /*!< 0x00002000 */
-#define RCC_APB2ENR_TIM8EN                   RCC_APB2ENR_TIM8EN_Msk            /*!< TIM8 Timer clock enable */
+#define RCC_APB2ENR_TIM8EN                   RCC_APB2EN_TMR8EN            /*!< TIM8 Timer clock enable */
 #define RCC_APB2ENR_ADC3EN_Pos               (15U)                             
 #define RCC_APB2ENR_ADC3EN_Msk               (0x1U << RCC_APB2ENR_ADC3EN_Pos)  /*!< 0x00008000 */
-#define RCC_APB2ENR_ADC3EN                   RCC_APB2ENR_ADC3EN_Msk            /*!< DMA1 clock enable */
+#define RCC_APB2ENR_ADC3EN                   RCC_APB2EN_ADC3EN            /*!< DMA1 clock enable */
 
 #define RCC_BDCR_LSEON_Pos                   (0U)                              
 #define RCC_BDCR_LSEON_Msk                   (0x1U << RCC_BDCR_LSEON_Pos)      /*!< 0x00000001 */

@@ -22,6 +22,8 @@
 #pragma once
 #include "at32f4xx_hal.h"
 
+#define BOARD_V4
+
 #define LEFT_HALL_U_PIN GPIO_PIN_5
 #define LEFT_HALL_V_PIN GPIO_PIN_6
 #define LEFT_HALL_W_PIN GPIO_PIN_7
@@ -76,13 +78,13 @@
 // #define LEFT_U_CUR_ADC ADC1
 // #define LEFT_V_CUR_ADC ADC1
 
-#define LEFT_DC_CUR_PIN GPIO_PIN_0
-#define LEFT_U_CUR_PIN GPIO_PIN_0
-#define LEFT_V_CUR_PIN GPIO_PIN_3
+#define LEFT_DC_CUR_PIN GPIO_PIN_0	//These don't exist on the V4 board
+#define LEFT_U_CUR_PIN GPIO_PIN_3
+#define LEFT_V_CUR_PIN GPIO_PIN_0
 
-#define LEFT_DC_CUR_PORT GPIOC
-#define LEFT_U_CUR_PORT GPIOA
-#define LEFT_V_CUR_PORT GPIOC
+#define LEFT_DC_CUR_PORT GPIOC		//These don't exist on the V4 board
+#define LEFT_U_CUR_PORT GPIOC		//These two seem to be changed around on the V4 board
+#define LEFT_V_CUR_PORT GPIOA
 
 // #define RIGHT_DC_CUR_ADC ADC2
 // #define RIGHT_U_CUR_ADC ADC2

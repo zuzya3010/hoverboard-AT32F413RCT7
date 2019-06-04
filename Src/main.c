@@ -92,6 +92,7 @@ void poweroff() {
 
 int main(void) {
   HAL_Init();
+
   __HAL_RCC_AFIO_CLK_ENABLE();
   HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
   /* System interrupt init*/
@@ -111,8 +112,8 @@ int main(void) {
   HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
 
   SystemClock_Config();
-
   __HAL_RCC_DMA1_CLK_DISABLE();
+
   MX_GPIO_Init();
   MX_TIM_Init();
   MX_ADC1_Init();
@@ -322,6 +323,8 @@ void SystemClock_Config(void) {
 
   /**Initializes the CPU, AHB and APB busses clocks
     */
+#ifndef AT32F403Rx_HD
+//Is automatically set at startup in SystemConfig 
   RCC_OscInitStruct.OscillatorType      = RCC_OSCILLATORTYPE_HSI;
   RCC_OscInitStruct.HSIState            = RCC_HSI_ON;
   RCC_OscInitStruct.HSICalibrationValue = 16;
@@ -329,7 +332,6 @@ void SystemClock_Config(void) {
   RCC_OscInitStruct.PLL.PLLSource       = RCC_PLLSOURCE_HSI_DIV2;
   RCC_OscInitStruct.PLL.PLLMUL          = RCC_PLL_MUL16;
   HAL_RCC_OscConfig(&RCC_OscInitStruct);
-
   /**Initializes the CPU, AHB and APB busses clocks
     */
   RCC_ClkInitStruct.ClockType      = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
@@ -338,9 +340,9 @@ void SystemClock_Config(void) {
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 	
-#ifdef AT32F403Rx_HD
-	HAL_RCC_ClockConfig(&RCC_ClkInitStruct, 0);
-#else
+// #ifdef AT32F403Rx_HD
+	// HAL_RCC_ClockConfig(&RCC_ClkInitStruct, 0);
+// #else
   HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2);
 #endif
 
@@ -354,8 +356,10 @@ void SystemClock_Config(void) {
 
   /**Configure the Systick
     */
+#ifndef AT32F403Rx_HD
+	//seems to not be available on AT32
   HAL_SYSTICK_CLKSourceConfig(SYSTICK_CLKSOURCE_HCLK);
-
+#endif
   /* SysTick_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
 }
