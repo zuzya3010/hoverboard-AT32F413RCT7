@@ -22,9 +22,22 @@
 #pragma once
 
 #include "at32f4xx_hal.h"
+#include "defines.h"
 
 void MX_GPIO_Init(void);
 void MX_TIM_Init(void);
 void MX_ADC1_Init(void);
 void MX_ADC2_Init(void);
 void UART_Init(void);
+
+#ifdef CONTROL_PPM
+void PPM_Init();
+void PPM_ISR_Callback();
+void PPM_SysTick_Callback();
+#endif
+
+void Nunchuck_Init();
+void Nunchuck_Read();
+void consoleScope();
+void consoleLog(char *message);
+void setScopeChannel(uint8_t ch, int16_t val);

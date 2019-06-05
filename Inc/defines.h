@@ -79,12 +79,12 @@
 // #define LEFT_V_CUR_ADC ADC1
 
 #define LEFT_DC_CUR_PIN GPIO_PIN_0	//These don't exist on the V4 board
-#define LEFT_U_CUR_PIN GPIO_PIN_3
-#define LEFT_V_CUR_PIN GPIO_PIN_0
+#define LEFT_U_CUR_PIN GPIO_PIN_0
+#define LEFT_V_CUR_PIN GPIO_PIN_3
 
 #define LEFT_DC_CUR_PORT GPIOC		//These don't exist on the V4 board
-#define LEFT_U_CUR_PORT GPIOC		//These two seem to be changed around on the V4 board
-#define LEFT_V_CUR_PORT GPIOA
+#define LEFT_U_CUR_PORT GPIOA		//These two seem to be changed around on the V4 board
+#define LEFT_V_CUR_PORT GPIOC
 
 // #define RIGHT_DC_CUR_ADC ADC2
 // #define RIGHT_U_CUR_ADC ADC2
@@ -160,3 +160,4 @@ typedef struct {
   uint16_t temp;
   uint16_t l_rx2;
 } adc_buf_t;
+

@@ -77,7 +77,7 @@ int milli_vel_error_sum = 0;
 
 
 void poweroff() {
-    if (abs(speed) < 20) {
+    if (ABS(speed) < 20) {
         buzzerPattern = 0;
         enable = 0;
         for (int i = 0; i < 8; i++) {
@@ -317,13 +317,14 @@ int main(void) {
 /** System Clock Configuration
 */
 void SystemClock_Config(void) {
+#ifndef AT32F403Rx_HD
   RCC_OscInitTypeDef RCC_OscInitStruct;
   RCC_ClkInitTypeDef RCC_ClkInitStruct;
   RCC_PeriphCLKInitTypeDef PeriphClkInit;
 
   /**Initializes the CPU, AHB and APB busses clocks
     */
-#ifndef AT32F403Rx_HD
+// #ifndef AT32F403Rx_HD
 //Is automatically set at startup in SystemConfig 
   RCC_OscInitStruct.OscillatorType      = RCC_OSCILLATORTYPE_HSI;
   RCC_OscInitStruct.HSIState            = RCC_HSI_ON;
@@ -340,26 +341,25 @@ void SystemClock_Config(void) {
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 	
-// #ifdef AT32F403Rx_HD
+
 	// HAL_RCC_ClockConfig(&RCC_ClkInitStruct, 0);
 // #else
   HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2);
-#endif
 
   PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_ADC;
   PeriphClkInit.AdcClockSelection    = RCC_ADCPCLK2_DIV8;  // 8 MHz
   HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit);
-
+#endif
   /**Configure the Systick interrupt time
     */
   HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq() / 1000);
 
   /**Configure the Systick
     */
-#ifndef AT32F403Rx_HD
+// #ifndef AT32F403Rx_HD
 	//seems to not be available on AT32
   HAL_SYSTICK_CLKSourceConfig(SYSTICK_CLKSOURCE_HCLK);
-#endif
+// #endif
   /* SysTick_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
 }

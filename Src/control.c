@@ -72,11 +72,11 @@ void PPM_Init() {
   __HAL_RCC_TIM2_CLK_ENABLE();
   TimHandle.Instance = TIM2;
   TimHandle.Init.Period = UINT16_MAX;
-  TimHandle.Init.Prescaler = (SystemCoreClock/DELAY_TIM_FREQUENCY_US)-1;;
-  TimHandle.Init.ClockDivision = 0;
+  TimHandle.Init.Prescaler = (HAL_RCC_GetHCLKFreq()/DELAY_TIM_FREQUENCY_US)-1;
+  TimHandle.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   TimHandle.Init.CounterMode = TIM_COUNTERMODE_UP;
   HAL_TIM_Base_Init(&TimHandle);
-
+  __HAL_TIM_ENABLE(&TimHandle);
   /* EXTI interrupt init*/
   HAL_NVIC_SetPriority(EXTI3_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(EXTI3_IRQn);

@@ -11,6 +11,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "at32f4xx_it.h"
 #include "config.h"
+#include "setup.h"
 
 extern DMA_HandleTypeDef hdma_i2c2_rx;
 extern DMA_HandleTypeDef hdma_i2c2_tx;
@@ -120,9 +121,9 @@ void PendSV_Handler(void)
 /**
 * @brief This function handles System tick timer.
 */
-#ifdef CONTROL_PPM
-void PPM_SysTick_Callback(void);
-#endif
+// #ifdef CONTROL_PPM
+// void PPM_SysTick_Callback(void);
+// #endif
 void SysTick_Handler(void) {
   /* USER CODE BEGIN SysTick_IRQn 0 */
 

@@ -1135,47 +1135,58 @@ typedef struct
 /**
   * @brief Inter Integrated Circuit Interface
   */
+// typedef struct
+// {
+// //changed to match HAL names
+   // /* __IO uint16_t CTRL1;
+    // uint16_t  RESERVED0;
+    // __IO uint16_t CTRL2;
+    // uint16_t  RESERVED1;
+    // __IO uint16_t OADDR1;
+    // uint16_t  RESERVED2;
+    // __IO uint16_t OADDR2;
+    // uint16_t  RESERVED3;
+    // __IO uint16_t DT;
+    // uint16_t  RESERVED4;
+    // __IO uint16_t STS1;
+    // uint16_t  RESERVED5;
+    // __IO uint16_t STS2;
+    // uint16_t  RESERVED6;
+    // __IO uint16_t CLKCTRL;
+    // uint16_t  RESERVED7;
+    // __IO uint16_t TMRISE;
+    // uint16_t  RESERVED8;*/
+	// __IO uint16_t CR1;
+	// uint16_t  RESERVED0;
+	// __IO uint16_t CR2;
+	// uint16_t  RESERVED1;
+	// __IO uint16_t OAR1;
+	// uint16_t  RESERVED2;
+	// __IO uint16_t OAR2;
+	// uint16_t  RESERVED3;
+	// __IO uint16_t DR;
+	// uint16_t  RESERVED4;
+	// __IO uint16_t SR1;
+	// uint16_t  RESERVED5;
+	// __IO uint16_t SR2;
+	// uint16_t  RESERVED6;
+	// __IO uint16_t CCR;
+	// uint16_t  RESERVED7;
+	// __IO uint16_t TRISE;
+	// uint16_t  RESERVED8;
+// } I2C_Type;
 typedef struct
 {
-//changed to match HAL names
-   /* __IO uint16_t CTRL1;
-    uint16_t  RESERVED0;
-    __IO uint16_t CTRL2;
-    uint16_t  RESERVED1;
-    __IO uint16_t OADDR1;
-    uint16_t  RESERVED2;
-    __IO uint16_t OADDR2;
-    uint16_t  RESERVED3;
-    __IO uint16_t DT;
-    uint16_t  RESERVED4;
-    __IO uint16_t STS1;
-    uint16_t  RESERVED5;
-    __IO uint16_t STS2;
-    uint16_t  RESERVED6;
-    __IO uint16_t CLKCTRL;
-    uint16_t  RESERVED7;
-    __IO uint16_t TMRISE;
-    uint16_t  RESERVED8;*/
-	__IO uint16_t CR1;
-	uint16_t  RESERVED0;
-	__IO uint16_t CR2;
-	uint16_t  RESERVED1;
-	__IO uint16_t OAR1;
-	uint16_t  RESERVED2;
-	__IO uint16_t OAR2;
-	uint16_t  RESERVED3;
-	__IO uint16_t DR;
-	uint16_t  RESERVED4;
-	__IO uint16_t SR1;
-	uint16_t  RESERVED5;
-	__IO uint16_t SR2;
-	uint16_t  RESERVED6;
-	__IO uint16_t CCR;
-	uint16_t  RESERVED7;
-	__IO uint16_t TRISE;
-	uint16_t  RESERVED8;
+  __IO uint32_t CR1;
+  __IO uint32_t CR2;
+  __IO uint32_t OAR1;
+  __IO uint32_t OAR2;
+  __IO uint32_t DR;
+  __IO uint32_t SR1;
+  __IO uint32_t SR2;
+  __IO uint32_t CCR;
+  __IO uint32_t TRISE;
 } I2C_Type;
-
 #define I2C_TypeDef I2C_Type
 
 /**
@@ -1286,26 +1297,39 @@ typedef struct
 /**
   * @brief Serial Peripheral Interface
   */
+// typedef struct
+// {
+    // __IO uint16_t CTRL1;
+    // uint16_t  RESERVED0;
+    // __IO uint16_t CTRL2;
+    // uint16_t  RESERVED1;
+    // __IO uint16_t STS;
+    // uint16_t  RESERVED2;
+    // __IO uint16_t DT;
+    // uint16_t  RESERVED3;
+    // __IO uint16_t CPOLY;
+    // uint16_t  RESERVED4;
+    // __IO uint16_t RCRC;
+    // uint16_t  RESERVED5;
+    // __IO uint16_t TCRC;
+    // uint16_t  RESERVED6;
+    // __IO uint16_t I2SCTRL;
+    // uint16_t  RESERVED7;
+    // __IO uint16_t I2SCLKP;
+    // uint16_t  RESERVED8;
+// } SPI_Type;
+
 typedef struct
 {
-    __IO uint16_t CTRL1;
-    uint16_t  RESERVED0;
-    __IO uint16_t CTRL2;
-    uint16_t  RESERVED1;
-    __IO uint16_t STS;
-    uint16_t  RESERVED2;
-    __IO uint16_t DT;
-    uint16_t  RESERVED3;
-    __IO uint16_t CPOLY;
-    uint16_t  RESERVED4;
-    __IO uint16_t RCRC;
-    uint16_t  RESERVED5;
-    __IO uint16_t TCRC;
-    uint16_t  RESERVED6;
-    __IO uint16_t I2SCTRL;
-    uint16_t  RESERVED7;
-    __IO uint16_t I2SCLKP;
-    uint16_t  RESERVED8;
+  __IO uint32_t CR1;
+  __IO uint32_t CR2;
+  __IO uint32_t SR;
+  __IO uint32_t DR;
+  __IO uint32_t CRCPR;
+  __IO uint32_t RXCRCR;
+  __IO uint32_t TXCRCR;
+  __IO uint32_t I2SCFGR;
+  __IO uint32_t I2SPR;
 } SPI_Type;
 
 #define SPI_TypeDef SPI_Type
@@ -1358,41 +1382,27 @@ typedef struct
 //So be carefull
 typedef struct
 {
-  __IO uint16_t CR1;             /*!< TIM control register 1,                      Address offset: 0x00 */
-  uint16_t  RESERVED0;
-  __IO uint16_t CR2;             /*!< TIM control register 2,                      Address offset: 0x04 */
-  uint16_t  RESERVED1;
-  __IO uint16_t SMCR;            /*!< TIM slave Mode Control register,             Address offset: 0x08 */
-  uint16_t  RESERVED2;
-  __IO uint16_t DIER;            /*!< TIM DMA/interrupt enable register,           Address offset: 0x0C */
-  uint16_t  RESERVED3;
-  __IO uint16_t SR;              /*!< TIM status register,                         Address offset: 0x10 */
-  uint16_t  RESERVED4;
-  __IO uint16_t EGR;             /*!< TIM event generation register,               Address offset: 0x14 */
-  uint16_t  RESERVED5;
-  __IO uint16_t CCMR1;           /*!< TIM  capture/compare mode register 1,        Address offset: 0x18 */
-  uint16_t  RESERVED6;
-  __IO uint16_t CCMR2;           /*!< TIM  capture/compare mode register 2,        Address offset: 0x1C */
-  uint16_t  RESERVED7;
-  __IO uint16_t CCER;            /*!< TIM capture/compare enable register,         Address offset: 0x20 */
-  uint16_t  RESERVED8;
-  __IO uint16_t CNT;             /*!< TIM counter register,                        Address offset: 0x24 */
-  __IO uint16_t PSC;             /*!< TIM prescaler register,                      Address offset: 0x28 */
-  uint16_t  RESERVED10;
-  __IO uint16_t ARR;             /*!< TIM auto-reload register,                    Address offset: 0x2C */
-  __IO uint16_t RCR;             /*!< TIM  repetition counter register,            Address offset: 0x30 */
-  uint16_t  RESERVED12;
+  __IO uint32_t CR1;             /*!< TIM control register 1,                      Address offset: 0x00 */
+  __IO uint32_t CR2;             /*!< TIM control register 2,                      Address offset: 0x04 */
+  __IO uint32_t SMCR;            /*!< TIM slave Mode Control register,             Address offset: 0x08 */
+  __IO uint32_t DIER;            /*!< TIM DMA/interrupt enable register,           Address offset: 0x0C */
+  __IO uint32_t SR;              /*!< TIM status register,                         Address offset: 0x10 */
+  __IO uint32_t EGR;             /*!< TIM event generation register,               Address offset: 0x14 */
+  __IO uint32_t CCMR1;           /*!< TIM  capture/compare mode register 1,        Address offset: 0x18 */
+  __IO uint32_t CCMR2;           /*!< TIM  capture/compare mode register 2,        Address offset: 0x1C */
+  __IO uint32_t CCER;            /*!< TIM capture/compare enable register,         Address offset: 0x20 */
+  __IO uint32_t CNT;             /*!< TIM counter register,                        Address offset: 0x24 */
+  __IO uint32_t PSC;             /*!< TIM prescaler register,                      Address offset: 0x28 */
+  __IO uint32_t ARR;             /*!< TIM auto-reload register,                    Address offset: 0x2C */
+  __IO uint32_t RCR;             /*!< TIM  repetition counter register,            Address offset: 0x30 */
   __IO uint32_t CCR1;            /*!< TIM capture/compare register 1,              Address offset: 0x34 */
   __IO uint32_t CCR2;            /*!< TIM capture/compare register 2,              Address offset: 0x38 */
   __IO uint32_t CCR3;            /*!< TIM capture/compare register 3,              Address offset: 0x3C */
   __IO uint32_t CCR4;            /*!< TIM capture/compare register 4,              Address offset: 0x40 */
-  __IO uint16_t BDTR;            /*!< TIM break and dead-time register,            Address offset: 0x44 */
-  uint16_t  RESERVED17;
-  __IO uint16_t DCR;             /*!< TIM DMA control register,                    Address offset: 0x48 */
-  uint16_t  RESERVED18;
-  __IO uint16_t DMAR;            /*!< TIM DMA address for full transfer register,  Address offset: 0x4C */
-  uint16_t  RESERVED19;
-  //__IO uint32_t OR;              /*!< TIM option register,                         Address offset: 0x50 */
+  __IO uint32_t BDTR;            /*!< TIM break and dead-time register,            Address offset: 0x44 */
+  __IO uint32_t DCR;             /*!< TIM DMA control register,                    Address offset: 0x48 */
+  __IO uint32_t DMAR;            /*!< TIM DMA address for full transfer register,  Address offset: 0x4C */
+ // __IO uint32_t OR;              /*!< TIM option register,                         Address offset: 0x50 */
 }TIM_TypeDef;
 
 //Added alias

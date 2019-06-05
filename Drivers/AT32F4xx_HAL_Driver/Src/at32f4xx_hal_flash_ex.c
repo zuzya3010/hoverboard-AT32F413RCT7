@@ -1012,9 +1012,9 @@ static HAL_StatusTypeDef FLASH_OB_UserConfig(uint8_t UserConfig)
   FLASH->OPTKEYR = FLASH_KEY2;
 
   /* Wait for last process to be completed */
-  status = FLASH_WaitForProcess(PRGM_TIMEOUT);
+  status = FLASH_WaitForLastOperation(PRGM_TIMEOUT);
 
-  if(status == FLASH_PRC_DONE)
+  if(status == HAL_OK)
   {
     /* Enable the Option Bytes Programming process */
     FLASH->CR |= CTRL_UOBPRGM_Set;
@@ -1022,9 +1022,9 @@ static HAL_StatusTypeDef FLASH_OB_UserConfig(uint8_t UserConfig)
     UOPTB->USR = UOB_IWDG | (uint16_t)(UOB_STOP | (uint16_t)(UOB_STDBY | ((uint16_t)0xF8)));
 
     /* Wait for last process to be completed */
-    status = FLASH_WaitForProcess(PRGM_TIMEOUT);
+    status = FLASH_WaitForLastOperation(PRGM_TIMEOUT);
 
-    if(status != FLASH_TIMEOUT)
+    if(status != HAL_OK)
     {
       /* if the program process is completed, disable the UOBPRGM Bit */
       FLASH->CR &= CTRL_UOBPRGM_Rst;
