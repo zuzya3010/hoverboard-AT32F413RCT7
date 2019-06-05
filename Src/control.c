@@ -7,6 +7,7 @@
 #include <string.h>
 
 TIM_HandleTypeDef TimHandle;
+TIM_HandleTypeDef TimHandleTim3;
 uint8_t ppm_count = 0;
 uint32_t timeout = 100;
 uint8_t nunchuck_data[6] = {0};
@@ -27,21 +28,52 @@ bool ppm_valid = true;
 #define IN_RANGE(x, low, up) (((x) >= (low)) && ((x) <= (up)))
 
 void PPM_ISR_Callback() {
+	static uint8_t skipNext = 0;
+	static uint32_t frameStart;
   // Dummy loop with 16 bit count wrap around
   uint16_t rc_delay = TIM2->CNT;
   TIM2->CNT = 0;
 
   if (rc_delay > 3000) {
+	  //start of frame
+	  TIM3->CNT = 0;
     if (ppm_valid && ppm_count == PPM_NUM_CHANNELS) {
       ppm_timeout = 0;
       memcpy(ppm_captured_value, ppm_captured_value_buffer, sizeof(ppm_captured_value));
     }
     ppm_valid = true;
     ppm_count = 0;
+	skipNext = 0;
   }
-  else if (ppm_count < PPM_NUM_CHANNELS && IN_RANGE(rc_delay, 900, 2100)){
-    timeout = 0;
-    ppm_captured_value_buffer[ppm_count++] = CLAMP(rc_delay, 1000, 2000) - 1000;
+  else if (ppm_count < PPM_NUM_CHANNELS){
+	  if(IN_RANGE(rc_delay, 900, 2100)){
+		timeout = 0;
+		if(skipNext){	//We received an incomplete frame and propably see the second half of it
+			if((TIM3->CNT - frameStart) < (ppm_captured_value_buffer[ppm_count]/10 + 100)){
+				//We can expect the value to not change that suddenly
+				//So if we see the next value aprox after the time the last channel took
+				//We can be safe this channel is finished
+				ppm_count++;
+				skipNext = 0;
+			} else {
+				//we have more disturbance in our signal or we lost track of the channels
+				skipNext = 1;
+			}
+		} else {
+			ppm_captured_value_buffer[ppm_count++] = CLAMP(rc_delay, 1000, 2000) - 1000;
+		}
+	  } 
+	  else {
+		  if(TIM3->CNT > 2000){
+			  //There is some error and we received something way after the start 
+			  ppm_valid = false;
+			  ppm_count = 0;
+		  }
+		  if(rc_delay < 900) {
+			  frameStart = TIM3->CNT - rc_delay/10;	//The start of the broken frame
+			  skipNext = 1;
+		  }
+	  }
   } else {
     ppm_valid = false;
   }
@@ -81,6 +113,16 @@ void PPM_Init() {
   HAL_NVIC_SetPriority(EXTI3_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(EXTI3_IRQn);
   HAL_TIM_Base_Start(&TimHandle);
+  
+  __HAL_RCC_TIM3_CLK_ENABLE();
+  TimHandleTim3.Instance = TIM3;
+  TimHandleTim3.Init.Period = UINT16_MAX;
+  TimHandleTim3.Init.Prescaler = (HAL_RCC_GetHCLKFreq()/100000)-1;	//10us
+  TimHandleTim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  TimHandleTim3.Init.CounterMode = TIM_COUNTERMODE_UP;
+  HAL_TIM_Base_Init(&TimHandleTim3);
+  __HAL_TIM_ENABLE(&TimHandleTim3);
+  HAL_TIM_Base_Start(&TimHandleTim3);
 }
 #endif
 
