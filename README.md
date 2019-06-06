@@ -1,31 +1,27 @@
 # hoverboard-firmware-hack
 
-![](https://raw.githubusercontent.com/NiklasFauth/hoverboard-firmware-hack/master/docs/pictures/armchair.gif)   ![](https://raw.githubusercontent.com/NiklasFauth/hoverboard-firmware-hack/master/docs/pictures/bobbycar.gif)
-![](https://raw.githubusercontent.com/NiklasFauth/hoverboard-firmware-hack/master/docs/pictures/transpotter.gif)   ![](https://raw.githubusercontent.com/NiklasFauth/hoverboard-firmware-hack/master/docs/pictures/chair.gif)
-
-
-This repo contains open source firmware for generic Hoverboard Mainboards.
-The firmware you can find here allows you to use your Hoverboard Hardware (like the Mainboard, Motors and Battery) for cool projects like driving armchairs, person-tracking transportation robots and every other application you can imagine that requires controlling the Motors.
-
-If you want an overview of what you can do with this firmware, here is a ~40min video of a talk about this project:
-https://media.ccc.de/v/gpn18-95-howto-moving-objects
-
+This repo is a fork of Niklas Fauths Hoverboard Hack Firmware for some of the newer mainboards with the 
+AT32F403RCT6 controller. In order to keep the code mostly compatible the HAL libraries were adapted to fit
+the AT32 naming scheme and registers. This is possible as the AT32F403 is a mostly compatible device to the
+STM32F103 used on older and other Hoverboard mainboards.
 ---
 
 ## Build Instructions
 
-Here are detailed build instructions for some finished projects.
-If possible, a prebuild firmware release is available for these usecases, so you don't need to compile the firmware yourself
+The code was compiled with GNU arm-none-eabi-gcc 5.4.1 under windows and should be compilable with other version of the arm-gcc.
 
-TranspOtter: https://github.com/NiklasFauth/hoverboard-firmware-hack/wiki/Build-Instruction:-TranspOtter
 
 ---
 
 ## Hardware
-![otter](https://raw.githubusercontent.com/NiklasFauth/hoverboard-firmware-hack/master/pinout.png)
+![otter](https://raw.githubusercontent.com/cloidnerux/hoverboard-firmware-hack/master/pinout.png)
 
-The original Hardware supports two 4-pin cables that originally were connected to the two sensor boards. They break out GND, 12/15V and USART2&3 of the Hoverboard mainboard.
-Both USART2 & 3 can be used for UART and I2C, PA2&3 can be used as 12bit ADCs.
+The main difference of the AT32 board is the use of dedicated gate drivers (IR2108 clones) and featuring less
+capacitors. Also there is no current sense resistor for each motor anymore but some overcurrent trigger on one GPIO pin.
+Lastly the connectors are a bit different from other versions of the hoverboard controllers.
+
+These boards see a lot of small changes over the years to make them cheaper or to implement certain functions. Your board
+might not be quite the same as the board shown here.
 
 The reverse-engineered schematics of the mainboard can be found here:
 http://vocke.tv/lib/exe/fetch.php?media=20150722_hoverboard_sch.pdf
@@ -39,32 +35,19 @@ Do not power the mainboard from the 3.3V of your programmer! This has already ki
 
 Make sure you hold the powerbutton or connect a jumper to the power button pins while flashing the firmware, as the STM might release the power latch and switches itself off during flashing. Battery > 36V have to be connected while flashing.
 
-To flash the STM32, use the ST-Flash utility (https://github.com/texane/stlink).
+I flashed my AT32 with a Segger J-Link mini using the SWD connector. 
 
-If you never flashed your mainboard before, the STM is probably locked. To unlock the flash, use the following OpenOCD command:
-```
-openocd -f interface/stlink-v2.cfg -f target/stm32f1x.cfg -c init -c "reset halt" -c "stm32f1x unlock 0"
-```
+As there is no direct flash access via SWD a flash loader has to be used. The appropriate flashloader was taken from the Keil uVision support package and is in a CMSIS Pack format. Using Segger OpenLoader feature one can add hos own support for the AT32F403.
+For this add following code to your `<Segger Installation Dir>\JLinkDevices.xml`
+    
+	<ChipInfo Vendor="Artery" Name="AT32F403RCT6" WorkRAMAddr="0x20000000" WorkRAMSize="38000" Core="JLINK_CORE_CORTEX_M4" />
+		<FlashBankInfo Name="Internal Flash Bank 1" BaseAddr="0x08000000" MaxSize="80000" Loader="Devices/AT32F403_1024.FLM" LoaderType="FLASH_ALGO_TYPE_OPEN" />
+	</Device>
 
-If that does not work:
-```
-openocd -f interface/stlink-v2.cfg -f target/stm32f1x.cfg -c init -c "reset halt" -c "mww 0x40022004 0x45670123" -c "mww 0x40022004 0xCDEF89AB" -c "mww 0x40022008 0x45670123" -c "mww 0x40022008 0xCDEF89AB" -c "mww 0x40022010 0x220" -c "mww 0x40022010 0x260" -c "sleep 100" -c "mww 0x40022010 0x230" -c "mwh 0x1ffff800 0x5AA5" -c "sleep 1000" -c "mww 0x40022010 0x2220" -c "sleep 100" -c "mdw 0x40022010" -c "mdw 0x4002201c" -c "mdw 0x1ffff800" -c targets -c "halt" -c "stm32f1x unlock 0"
-```
-```
-openocd -f interface/stlink-v2.cfg -f target/stm32f1x.cfg -c init -c "reset halt" -c "mww 0x40022004 0x45670123" -c "mww 0x40022004 0xCDEF89AB" -c "mww 0x40022008 0x45670123" -c "mww 0x40022008 0xCDEF89AB" -c targets -c "halt" -c "stm32f1x unlock 0"
-```
-Or use the Windows ST-Link utility.
+and copy the "AT32F403_1024.FLM" from the folder flash to `<Segger Installation Dir>\Devices`
 
-Then you can simply flash the firmware:
-```
-st-flash --reset write build/hover.bin 0x8000000
-```
-or
-```
-openocd -f interface/stlink-v2.cfg -f target/stm32f1x.cfg -c flash "write_image erase build/hover.bin 0x8000000"
-```
+I did not test to flash the AT32 with a ST-Link but I think this should be no big problem.
 
----
 ## Troubleshooting
 First, check that power is connected and voltage is >36V while flashing.
 If the board draws more than 100mA in idle, it's probably broken.
