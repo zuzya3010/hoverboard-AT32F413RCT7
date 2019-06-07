@@ -74,6 +74,22 @@
 // left sensor board cable. keep cable short, use shielded cable, use ferrits, stabalize voltage in nunchuck, use the right one of the 2 types of nunchucks, add i2c pullups. use original nunchuck. most clones does not work very well.
 //#define CONTROL_NUNCHUCK            // use nunchuck as input. disable DEBUG_SERIAL_USART3!
 
+// ############################### MOTOR CONTROL (overwrite) #########################
+#define CTRL_TYP_SEL            3   // [-] Control method selection: 0 = Commutation , 1 = Pure Trapezoidal , 2 = Sinusoidal, 3 = Sinusoidal 3rd armonic (default)
+#define PHASE_ADV_ENA           1   // [-] Phase advance enable parameter: 0 = disabled, 1 = enabled (default)
+
+// GENERAL NOTES:
+// 1. All the available motor parameters can be found in the BLDC_controller_data.c
+// 2. For more details regarding the parameters and the working principle of the controller please consult the Simulink model
+// 3. A webview was created, so Matlab/Simulink installation is not needed, unless you want to regenerate the code
+
+// NOTES Phase Advance / Field weakening:
+// 1. In BLDC_controller_data.c you can find the Phase advance Map as a function of Duty Cycle: MAP = a_phaAdv_M1, XAXIS = r_phaAdvDC_XA
+// 2. The default calibration was experimentally calibrated on the real motor based on the minimum noise and minimum torque ripple
+// 3. If you re-calibrate the Phase advance map please take all the safety measures! 
+// 4. I do not recommend more than 40 deg MAX Phase advance. The motors can spin VERY VERY FAST!!! Please use it with care!!
+
+
 // ############################### DRIVING BEHAVIOR ###############################
 
 // inputs:
@@ -85,7 +101,7 @@
 // - weakr and weakl: field weakening for extra boost at high speed (speedR > 700 and speedL > 700). 0 to ~400
 
 #define FILTER              0.1  // lower value == softer filter. do not use values <0.01, you will get float precision issues.
-#define SPEED_COEFFICIENT   0.5  // higher value == stronger. 0.0 to ~2.0?
+#define SPEED_COEFFICIENT   1.0  // higher value == stronger. 0.0 to ~2.0?
 #define STEER_COEFFICIENT   0.5  // higher value == stronger. if you do not want any steering, set it to 0.0; 0.0 to 1.0
 //#define INVERT_R_DIRECTION
 #define INVERT_L_DIRECTION

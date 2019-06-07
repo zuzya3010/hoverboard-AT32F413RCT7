@@ -25,6 +25,27 @@
 #include "config.h"
 //#include "hd44780.h"
 
+// ###############################################################################
+#include "BLDC_controller.h"            /* Model's header file */
+#include "rtwtypes.h"
+
+RT_MODEL rtM_Left_;    /* Real-time model */
+RT_MODEL rtM_Right_;   /* Real-time model */
+RT_MODEL *const rtM_Left = &rtM_Left_;
+RT_MODEL *const rtM_Right = &rtM_Right_;
+
+P rtP;                           /* Block parameters (auto storage) */
+
+DW rtDW_Left;                    /* Observable states */
+ExtU rtU_Left;                   /* External inputs */
+ExtY rtY_Left;                   /* External outputs */
+
+DW rtDW_Right;                   /* Observable states */
+ExtU rtU_Right;                  /* External inputs */
+ExtY rtY_Right;                  /* External outputs */
+// ###############################################################################
+
+
 void SystemClock_Config(void);
 
 extern TIM_HandleTypeDef htim_left;
@@ -55,8 +76,8 @@ int speed; // global variable for speed. -1000 to 1000
 
 extern volatile int pwml;  // global variable for pwm left. -1000 to 1000
 extern volatile int pwmr;  // global variable for pwm right. -1000 to 1000
-extern volatile int weakl; // global variable for field weakening left. -1000 to 1000
-extern volatile int weakr; // global variable for field weakening right. -1000 to 1000
+//extern volatile int weakl; // global variable for field weakening left. -1000 to 1000
+//extern volatile int weakr; // global variable for field weakening right. -1000 to 1000
 
 extern uint8_t buzzerFreq;    // global variable for the buzzer pitch. can be 1, 2, 3, 4, 5, 6, 7...
 extern uint8_t buzzerPattern; // global variable for the buzzer pattern. can be 1, 2, 3, 4, 5, 6, 7...
@@ -127,6 +148,30 @@ int main(void) {
 
   HAL_ADC_Start(&hadc1);
   HAL_ADC_Start(&hadc2);
+
+// Matlab Init
+// ###############################################################################
+  
+  /* Set BLDC controller parameters */  
+  rtP.z_ctrlTypSel        = CTRL_TYP_SEL;
+  rtP.b_phaAdvEna         = PHASE_ADV_ENA;  
+  
+  /* Pack LEFT motor data into RTM */
+  rtM_Left->defaultParam  = &rtP;
+  rtM_Left->dwork         = &rtDW_Left;
+  rtM_Left->inputs        = &rtU_Left;
+  rtM_Left->outputs       = &rtY_Left;
+
+  /* Pack RIGHT motor data into RTM */
+  rtM_Right->defaultParam = &rtP;
+  rtM_Right->dwork        = &rtDW_Right;
+  rtM_Right->inputs       = &rtU_Right;
+  rtM_Right->outputs      = &rtY_Right;
+
+  /* Initialize BLDC controllers */
+  BLDC_controller_initialize(rtM_Left);
+  BLDC_controller_initialize(rtM_Right);
+
 
   for (int i = 8; i >= 0; i--) {
     buzzerFreq = i;
@@ -274,7 +319,7 @@ int main(void) {
 
 
     // ####### POWEROFF BY POWER-BUTTON #######
-    if (HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN) && weakr == 0 && weakl == 0) {
+    if (HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN)) {
       enable = 0;
       while (HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN)) {}
       poweroff();
@@ -282,7 +327,7 @@ int main(void) {
 
 
     // ####### BEEP AND EMERGENCY POWEROFF #######
-    if ((TEMP_POWEROFF_ENABLE && board_temp_deg_c >= TEMP_POWEROFF && abs(speed) < 20) || (batteryVoltage < ((float)BAT_LOW_DEAD * (float)BAT_NUMBER_OF_CELLS) && abs(speed) < 20)) {  // poweroff before mainboard burns OR low bat 3
+    if ((TEMP_POWEROFF_ENABLE && board_temp_deg_c >= TEMP_POWEROFF && ABS(speed) < 20) || (batteryVoltage < ((float)BAT_LOW_DEAD * (float)BAT_NUMBER_OF_CELLS) && ABS(speed) < 20)) {  // poweroff before mainboard burns OR low bat 3
       poweroff();
     } else if (TEMP_WARNING_ENABLE && board_temp_deg_c >= TEMP_WARNING) {  // beep if mainboard gets hot
       buzzerFreq = 4;
@@ -303,7 +348,7 @@ int main(void) {
 
 
     // ####### INACTIVITY TIMEOUT #######
-    if (abs(speedL) > 50 || abs(speedR) > 50) {
+    if (ABS(speedL) > 50 || ABS(speedR) > 50) {
       inactivity_timeout_counter = 0;
     } else {
       inactivity_timeout_counter ++;
