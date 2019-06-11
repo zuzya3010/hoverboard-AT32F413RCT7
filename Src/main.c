@@ -239,8 +239,14 @@ int main(void) {
     #endif
 
     #ifdef CONTROL_PPM
-      cmd1 = CLAMP((ppm_captured_value[0] - 500) * 2, -1000, 1000);
-      cmd2 = CLAMP((ppm_captured_value[1] - 500) * 2, -1000, 1000);
+		if(ABS(ppm_captured_value[0] - 500) > PPM_DEAD_BAND)
+			cmd1 = CLAMP((ppm_captured_value[0] - 500) * 2, -1000, 1000);
+		else 
+			cmd1 = 0;
+		if(ABS(ppm_captured_value[1] - 500) > PPM_DEAD_BAND)
+			cmd2 = CLAMP((ppm_captured_value[1] - 500) * 2, -1000, 1000);
+		else
+			cmd2 = 0;
       button1 = ppm_captured_value[5] > 500;
       float scale = ppm_captured_value[2] / 1000.0f;
     #endif
