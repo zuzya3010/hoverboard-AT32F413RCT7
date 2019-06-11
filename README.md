@@ -1,9 +1,7 @@
 # hoverboard-firmware-hack
 
-This repo is a fork of Niklas Fauths Hoverboard Hack Firmware for some of the newer mainboards with the 
-AT32F403RCT6 controller. In order to keep the code mostly compatible the HAL libraries were adapted to fit
-the AT32 naming scheme and registers. This is possible as the AT32F403 is a mostly compatible device to the
-STM32F103 used on older and other Hoverboard mainboards.
+This repo is a fork of Niklas Fauths Hoverboard Hack Firmware for some of the newer mainboards with the AT32F403RCT6 controller. In order to keep the code mostly compatible the HAL libraries were adapted to fit the AT32 naming scheme and registers. This is possible as the AT32F403 is a mostly compatible device to the STM32F103 used on older and other Hoverboard mainboards.
+
 ---
 
 ## Build Instructions
