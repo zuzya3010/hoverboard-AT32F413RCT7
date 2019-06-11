@@ -37,11 +37,12 @@ Make sure you hold the powerbutton or connect a jumper to the power button pins 
 
 I flashed my AT32 with a Segger J-Link mini using the SWD connector. 
 
-As there is no direct flash access via SWD a flash loader has to be used. The appropriate flashloader was taken from the Keil uVision support package and is in a CMSIS Pack format. Using Segger OpenLoader feature one can add hos own support for the AT32F403.
+As there is no direct flash access via SWD a flash loader has to be used. The appropriate flashloader was taken from the Keil uVision support package and is in a CMSIS Pack format. Using Segger OpenLoader feature one can add his own support for the AT32F403.
 For this add following code to your `<Segger Installation Dir>\JLinkDevices.xml`
     
-	<ChipInfo Vendor="Artery" Name="AT32F403RCT6" WorkRAMAddr="0x20000000" WorkRAMSize="38000" Core="JLINK_CORE_CORTEX_M4" />
-		<FlashBankInfo Name="Internal Flash Bank 1" BaseAddr="0x08000000" MaxSize="80000" Loader="Devices/AT32F403_1024.FLM" LoaderType="FLASH_ALGO_TYPE_OPEN" />
+	<Device>
+		<ChipInfo Vendor="Artery" Name="AT32F403RCT6" WorkRAMAddr="0x20000000" WorkRAMSize="0x38000" Core="JLINK_CORE_CORTEX_M4" />
+		<FlashBankInfo Name="Internal Flash Bank 1" BaseAddr="0x08000000" MaxSize="0x80000" Loader="Devices/AT32F403_1024.FLM" LoaderType="FLASH_ALGO_TYPE_OPEN" />
 	</Device>
 
 and copy the "AT32F403_1024.FLM" from the folder flash to `<Segger Installation Dir>\Devices`

@@ -98,7 +98,7 @@ P rtP = {
   /* Variable: cf_speedCoef
    * Referenced by: '<S16>/cf_spdCoef'
    */
-  11111,
+  10667,
 
   /* Variable: cf_speedFilt
    * Referenced by: '<S16>/cf_speedFilt'
