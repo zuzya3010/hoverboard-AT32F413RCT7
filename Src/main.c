@@ -74,6 +74,8 @@ uint8_t button1, button2;
 int steer; // global variable for steering. -1000 to 1000
 int speed; // global variable for speed. -1000 to 1000
 
+float local_speed_coefficent;
+
 extern volatile int pwml;  // global variable for pwm left. -1000 to 1000
 extern volatile int pwmr;  // global variable for pwm right. -1000 to 1000
 //extern volatile int weakl; // global variable for field weakening left. -1000 to 1000
@@ -184,6 +186,7 @@ int main(void) {
   int lastSpeedL = 0, lastSpeedR = 0;
   int speedL = 0, speedR = 0;
   float direction = 1;
+  local_speed_coefficent = SPEED_COEFFICIENT;
 
   #ifdef CONTROL_PPM
     PPM_Init();
@@ -248,7 +251,8 @@ int main(void) {
 		else
 			cmd2 = 0;
       button1 = ppm_captured_value[5] > 500;
-      float scale = ppm_captured_value[2] / 1000.0f;
+      //float scale = ppm_captured_value[2] / 1000.0f;
+	  local_speed_coefficent = ppm_captured_value[3] / 1000.0f;
     #endif
 
     #ifdef CONTROL_ADC
@@ -277,8 +281,8 @@ int main(void) {
 
 
     // ####### MIXER #######
-    speedR = CLAMP(speed * SPEED_COEFFICIENT -  steer * STEER_COEFFICIENT, -1000, 1000);
-    speedL = CLAMP(speed * SPEED_COEFFICIENT +  steer * STEER_COEFFICIENT, -1000, 1000);
+    speedR = CLAMP(speed * local_speed_coefficent -  steer * STEER_COEFFICIENT, -1000, 1000);
+    speedL = CLAMP(speed * local_speed_coefficent +  steer * STEER_COEFFICIENT, -1000, 1000);
 
 
     #ifdef ADDITIONAL_CODE
