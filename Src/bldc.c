@@ -22,7 +22,7 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "at32f4xx_hal.h"
+#include "stm32f1xx_hal.h"
 #include "defines.h"
 #include "setup.h"
 #include "config.h"

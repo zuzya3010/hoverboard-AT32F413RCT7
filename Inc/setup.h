@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include "at32f4xx_hal.h"
+#include "stm32f1xx_hal.h"
 #include "config.h"
 
 void MX_GPIO_Init(void);

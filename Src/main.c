@@ -19,7 +19,7 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "at32f4xx_hal.h"
+#include "stm32f1xx_hal.h"
 #include "defines.h"
 #include "setup.h"
 #include "config.h"
@@ -57,6 +57,14 @@ extern volatile adc_buf_t adc_buffer;
 extern I2C_HandleTypeDef hi2c2;
 extern UART_HandleTypeDef huart2;
 
+#ifdef DEBUG_I2C_LCD
+extern I2C_HandleTypeDef hi2c2;
+#endif
+
+#ifdef CONTROL_SERIAL_USART2
+extern UART_HandleTypeDef huart2;
+#endif
+
 int cmd1;  // normalized input values. -1000 to 1000
 int cmd2;
 int cmd3;
@@ -75,6 +83,7 @@ int steer; // global variable for steering. -1000 to 1000
 int speed; // global variable for speed. -1000 to 1000
 
 float local_speed_coefficent;
+float local_steer_coefficent;
 
 extern volatile int pwml;  // global variable for pwm left. -1000 to 1000
 extern volatile int pwmr;  // global variable for pwm right. -1000 to 1000
@@ -91,9 +100,35 @@ extern float batteryVoltage; // global variable for battery voltage
 
 uint32_t inactivity_timeout_counter;
 
+#ifdef CONTROL_NUNCHUCK
 extern uint8_t nunchuck_data[6];
+#endif
+
 #ifdef CONTROL_PPM
 extern volatile uint16_t ppm_captured_value[PPM_NUM_CHANNELS+1];
+#endif
+
+#ifdef CONTROL_DETECT_HALL
+typedef enum
+{
+	wait = 0,
+	beep = 1,
+	spin = 2
+} motor_test_state;
+
+typedef struct
+{
+	motor_test_state state;
+	uint16_t time;
+	uint16_t timeout;
+	uint16_t hall_cfg;
+	uint16_t beep_cnt;
+	uint16_t beep_on;
+} motor_test_admin;
+
+motor_test_admin tst_admin = {0,0,1000/DELAY_IN_MAIN_LOOP,5,0,0};
+extern volatile uint8_t hall_idx_left;
+extern volatile uint8_t hall_idx_right;
 #endif
 
 int milli_vel_error_sum = 0;
@@ -183,10 +218,15 @@ int main(void) {
 
   HAL_GPIO_WritePin(LED_PORT, LED_PIN, 1);
 
+  #if defined (CONTROL_MOTOR_TEST) || defined (CONTROL_DETECT_HALL)
+  #else
   int lastSpeedL = 0, lastSpeedR = 0;
+  #endif
+
   int speedL = 0, speedR = 0;
   float direction = 1;
   local_speed_coefficent = SPEED_COEFFICIENT;
+  local_steer_coefficent = STEER_COEFFICIENT;
 
   #ifdef CONTROL_PPM
     PPM_Init();
@@ -252,7 +292,9 @@ int main(void) {
 			cmd2 = 0;
       button1 = ppm_captured_value[5] > 500;
       //float scale = ppm_captured_value[2] / 1000.0f;
-	  local_speed_coefficent = ppm_captured_value[3] / 1000.0f;
+	  //PPM input goes from 0 to 1000, map this to 0 to 2
+	  local_speed_coefficent = ppm_captured_value[3] / 500.0f;
+	  local_steer_coefficent = ppm_captured_value[4] / 1000.0f;
     #endif
 
     #ifdef CONTROL_ADC
@@ -279,11 +321,107 @@ int main(void) {
     steer = steer * (1.0 - FILTER) + cmd1 * FILTER;
     speed = speed * (1.0 - FILTER) + cmd2 * FILTER;
 
+#ifdef CONTROL_MOTOR_TEST
+    //keep activity timeout happy
+    speedR = 100;
+    speedL = 100;
+
+	#ifdef INVERT_R_DIRECTION
+	  pwmr = 60;
+	#else
+	  pwmr = -60;
+	#endif
+	#ifdef INVERT_L_DIRECTION
+	  pwml = -60;
+	#else
+	  pwml = 60;
+	#endif
+
+#elif defined CONTROL_DETECT_HALL
+
+    //keep activity timeout happy
+    speedR = 100;
+    speedL = 100;
+
+    //update timer
+    tst_admin.time++;
+
+    //continue test
+    switch(tst_admin.state)
+    {
+		//wait until timeout, then set configuration and go to beep
+		case wait:
+			if(tst_admin.time == tst_admin.timeout)
+			{
+				tst_admin.hall_cfg = (tst_admin.hall_cfg + 1) % 6;
+				hall_idx_left  = tst_admin.hall_cfg;
+				hall_idx_right = tst_admin.hall_cfg;
+				tst_admin.state = beep;
+				tst_admin.beep_cnt = 0;
+				tst_admin.beep_on  = 0;
+				tst_admin.timeout = tst_admin.time + 500/DELAY_IN_MAIN_LOOP;
+			}
+			break;
+		//wait until timeout to turn buzzer on or off, when turning buzzer off, increment nr_beeps
+		//if number of beeps has been reached, go to spin
+		case beep:
+			if(tst_admin.time == tst_admin.timeout)
+			{
+				if(tst_admin.beep_on)
+				{
+					//turn buzzer off, increment beep_cnt, and set new timeout
+					buzzerFreq = 0;
+					tst_admin.beep_on = 0;
+					tst_admin.beep_cnt++;
+					tst_admin.timeout = tst_admin.time + 300/DELAY_IN_MAIN_LOOP;
+				}
+				else
+				{
+					//check beep_cnt. If count has been reached, spin 5s, else beep buzzer 0.5s
+					if(tst_admin.beep_cnt == tst_admin.hall_cfg + 1)
+					{
+						#ifdef INVERT_R_DIRECTION
+						  pwmr = 60;
+						#else
+						  pwmr = -60;
+						#endif
+						#ifdef INVERT_L_DIRECTION
+						  pwml = -60;
+						#else
+						  pwml = 60;
+						#endif
+						tst_admin.state = spin;
+						tst_admin.timeout = tst_admin.time + 3000/DELAY_IN_MAIN_LOOP;
+					}
+					else
+					{
+						buzzerFreq = 16;
+						tst_admin.beep_on = 1;
+						tst_admin.timeout = tst_admin.time + 100/DELAY_IN_MAIN_LOOP;
+					}
+				}
+			}
+			break;
+		//wait until timeout to stop spinning
+		case spin:
+			if(tst_admin.time == tst_admin.timeout)
+			{
+				pwmr = 0;
+				pwml = 0;
+				tst_admin.state = wait;
+				tst_admin.timeout = tst_admin.time + 750/DELAY_IN_MAIN_LOOP;
+			}
+			break;
+		default:
+			//do nothing
+			break;
+    }
+
+#else
 
     // ####### MIXER #######
-    speedR = CLAMP(speed * local_speed_coefficent -  steer * STEER_COEFFICIENT, -1000, 1000);
-    speedL = CLAMP(speed * local_speed_coefficent +  steer * STEER_COEFFICIENT, -1000, 1000);
-
+    speedR = CLAMP(speed * local_speed_coefficent -  steer * local_steer_coefficent, -1000, 1000);
+    speedL = CLAMP(speed * local_speed_coefficent +  steer * local_steer_coefficent, -1000, 1000);
 
     #ifdef ADDITIONAL_CODE
       ADDITIONAL_CODE;
@@ -306,7 +444,7 @@ int main(void) {
 
     lastSpeedL = speedL;
     lastSpeedR = speedR;
-
+#endif
 
     if (inactivity_timeout_counter % 25 == 0) {
       // ####### CALC BOARD TEMPERATURE #######

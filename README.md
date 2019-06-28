@@ -8,6 +8,16 @@ This repo is a fork of Niklas Fauths Hoverboard Hack Firmware for some of the ne
 
 The code was compiled with GNU arm-none-eabi-gcc 5.4.1 under windows and should be compilable with other version of the arm-gcc.
 
+The makefile supports both controllers, STM32 and AT32. The controller is selected by an additional command to the makefile
+
+    make AT32
+	
+or
+
+    make STM32
+	
+it defaults to AT32. The makefile creates a file in the build directory to detect plattform change and to clean up all the necessary files.
+
 
 ---
 

@@ -1,21 +1,9 @@
+// ############################### About ###############################
+// This file allows to change the personal settings without pusing them to the git repository
+
+
 #pragma once
-#include "stm32f1xx_hal.h"
 
-
-// ############################### DO-NOT-TOUCH SETTINGS ###############################
-
-#define PWM_FREQ         16000      // PWM frequency in Hz
-#define DEAD_TIME        32         // PWM deadtime
-
-#define DELAY_IN_MAIN_LOOP 5        // in ms. default 5. it is independent of all the timing critical stuff. do not touch if you do not know what you are doing.
-
-#define TIMEOUT          5          // number of wrong / missing input commands before emergency off
-
-// ############################### Custom Configuration ###############################
-#ifdef CUSTOM_CONFIG
-#include "custom_config.h"
-
-#else
 
 // ############################### GENERAL ###############################
 
@@ -34,15 +22,15 @@
 
 #define DC_CUR_LIMIT     15         // DC current limit in amps per motor. so 15 means it will draw 30A out of your battery. it does not disable motors, it is a soft current limit.
 
-// Board overheat detection: the sensor is inside the STM/GD chip. it is very inaccurate without calibration (up to 45째C). so only enable this funcion after calibration! let your board cool down. see <How to calibrate>. get the real temp of the chip by thermo cam or another temp-sensor taped on top of the chip and write it to TEMP_CAL_LOW_DEG_C. write debug value 8 to TEMP_CAL_LOW_ADC. drive around to warm up the board. it should be at least 20째C warmer. repeat it for the HIGH-values. enable warning and/or poweroff and make and flash firmware.
+// Board overheat detection: the sensor is inside the STM/GD chip. it is very inaccurate without calibration (up to 45캜). so only enable this funcion after calibration! let your board cool down. see <How to calibrate>. get the real temp of the chip by thermo cam or another temp-sensor taped on top of the chip and write it to TEMP_CAL_LOW_DEG_C. write debug value 8 to TEMP_CAL_LOW_ADC. drive around to warm up the board. it should be at least 20캜 warmer. repeat it for the HIGH-values. enable warning and/or poweroff and make and flash firmware.
 #define TEMP_CAL_LOW_ADC        1655      // temperature 1: ADC value
-#define TEMP_CAL_LOW_DEG_C      35.8      // temperature 1: measured temperature [째C]
+#define TEMP_CAL_LOW_DEG_C      35.8      // temperature 1: measured temperature [캜]
 #define TEMP_CAL_HIGH_ADC       1588      // temperature 2: ADC value
-#define TEMP_CAL_HIGH_DEG_C     48.9      // temperature 2: measured temperature [째C]
+#define TEMP_CAL_HIGH_DEG_C     48.9      // temperature 2: measured temperature [캜]
 #define TEMP_WARNING_ENABLE     0         // to beep or not to beep, 1 or 0, DO NOT ACTIVITE WITHOUT CALIBRATION!
-#define TEMP_WARNING            60        // annoying fast beeps [째C]
+#define TEMP_WARNING            60        // annoying fast beeps [캜]
 #define TEMP_POWEROFF_ENABLE    0         // to poweroff or not to poweroff, 1 or 0, DO NOT ACTIVITE WITHOUT CALIBRATION!
-#define TEMP_POWEROFF           65        // overheat poweroff. (while not driving) [째C]
+#define TEMP_POWEROFF           65        // overheat poweroff. (while not driving) [캜]
 
 #define INACTIVITY_TIMEOUT 8        // minutes of not driving until poweroff. it is not very precise.
 
@@ -160,27 +148,3 @@ else { \
 else {\
   weakl = 0;\
   weakr = 0;
-
-#endif
-
-// ############################### VALIDATE SETTINGS ###############################
-
-#if defined CONTROL_SERIAL_USART2 && defined CONTROL_ADC
-  #error CONTROL_ADC and CONTROL_SERIAL_USART2 not allowed. it is on the same cable.
-#endif
-
-#if defined CONTROL_SERIAL_USART2 && defined CONTROL_PPM
-  #error CONTROL_PPM and CONTROL_SERIAL_USART2 not allowed. it is on the same cable.
-#endif
-
-#if defined DEBUG_SERIAL_USART3 && defined CONTROL_NUNCHUCK
-  #error CONTROL_NUNCHUCK and DEBUG_SERIAL_USART3 not allowed. it is on the same cable.
-#endif
-
-#if defined DEBUG_SERIAL_USART3 && defined DEBUG_I2C_LCD
-  #error DEBUG_I2C_LCD and DEBUG_SERIAL_USART3 not allowed. it is on the same cable.
-#endif
-
-#if defined CONTROL_PPM && defined CONTROL_ADC && defined CONTROL_NUNCHUCK || defined CONTROL_PPM && defined CONTROL_ADC || defined CONTROL_ADC && defined CONTROL_NUNCHUCK || defined CONTROL_PPM && defined CONTROL_NUNCHUCK
-  #error only 1 input method allowed. use CONTROL_PPM or CONTROL_ADC or CONTROL_NUNCHUCK.
-#endif
