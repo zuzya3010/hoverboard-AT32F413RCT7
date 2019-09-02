@@ -55,7 +55,29 @@ For this add following code to your `<Segger Installation Dir>\JLinkDevices.xml`
 
 and copy the "AT32F403_1024.FLM" from the folder flash to `<Segger Installation Dir>\Devices`
 
-I did not test to flash the AT32 with a ST-Link but I think this should be no big problem.
+Flashing with ST-Link needs some patching of OpenOCD to detect the processor as described here https://github.com/bipropellant/bipropellant-hoverboard-firmware/issues/67#issuecomment-516657520
+
+After that it should be possible to flash with the flash comand for STM32:
+To flash the STM32, use the ST-Flash utility (https://github.com/texane/stlink).
+
+If you never flashed your mainboard before, the STM is probably locked. To unlock the flash, use the following OpenOCD command:
+```
+openocd -f interface/stlink-v2.cfg -f target/stm32f1x.cfg -c init -c "reset halt" -c "stm32f1x unlock 0"
+```
+
+If that does not work:
+```
+openocd -f interface/stlink-v2.cfg -f target/stm32f1x.cfg -c init -c "reset halt" -c "mww 0x40022004 0x45670123" -c "mww 0x40022004 0xCDEF89AB" -c "mww 0x40022008 0x45670123" -c "mww 0x40022008 0xCDEF89AB" -c "mww 0x40022010 0x220" -c "mww 0x40022010 0x260" -c "sleep 100" -c "mww 0x40022010 0x230" -c "mwh 0x1ffff800 0x5AA5" -c "sleep 1000" -c "mww 0x40022010 0x2220" -c "sleep 100" -c "mdw 0x40022010" -c "mdw 0x4002201c" -c "mdw 0x1ffff800" -c targets -c "halt" -c "stm32f1x unlock 0"
+```
+```
+openocd -f interface/stlink-v2.cfg -f target/stm32f1x.cfg -c init -c "reset halt" -c "mww 0x40022004 0x45670123" -c "mww 0x40022004 0xCDEF89AB" -c "mww 0x40022008 0x45670123" -c "mww 0x40022008 0xCDEF89AB" -c targets -c "halt" -c "stm32f1x unlock 0"
+```
+Or use the Windows ST-Link utility.
+
+Then you can simply flash the firmware:
+```
+st-flash --reset write build/hover.bin 0x8000000
+```
 
 ## Troubleshooting
 First, check that power is connected and voltage is >36V while flashing.
