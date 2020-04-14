@@ -13,15 +13,15 @@ To build, clone this repository and run make:
     git clone https://github.com/someone42/hoverboard-firmware-hack.git
     make
 
-Only V5.1 boards with the AT32F413RCT7 controller are supported. Use https://github.com/cloidnerux/hoverboard-firmware-hack if you need support for boards that use the AT32F403RCT6 or STM32F103 controller.
+Only boards with the AT32F413RCT7 controller are supported. Use https://github.com/cloidnerux/hoverboard-firmware-hack if you need support for boards that use the AT32F403RCT6 or STM32F103 controller.
 
 ---
 
 ## Hardware
 ![otter](https://raw.githubusercontent.com/cloidnerux/hoverboard-firmware-hack/master/pinout.png)
 
-The main difference of the V5.1 board compared to V4 is the use of a cheaper controller and also
-(somehow) even less capacitors.
+The above image is a V4 board, however, the V5.1 looks very similar. The main difference of the V5.1 board compared to V4 is the use of a cheaper controller and also
+(somehow) even less capacitors. All the pinouts for the connectors on the V5.1 mainboard are identical to the V4 mainboard.
 
 These boards see a lot of small changes over the years to make them cheaper or to implement certain functions. Your board
 might not be quite the same as the board shown here.
@@ -42,18 +42,18 @@ I flashed my AT32 with a ST-Link using the SWD connector.
 
 If you never flashed your mainboard before, the STM is probably locked. To unlock the flash, use the following OpenOCD command:
 ```
-openocd -f interface/stlink-v2.cfg -f target/stm32f3x.cfg -c init -c "reset halt" -c "stm32f2x unlock 0"
+openocd -f interface/stlink.cfg -f target/stm32f3x.cfg -c init -c "reset halt" -c "stm32f2x unlock 0"
 ```
 
-If that does not work:
+To program, use the following OpenOCD command:
 ```
-openocd -f interface/stlink-v2.cfg -f target/stm32f3x.cfg -c init -c "reset halt" -c "mww 0x40022004 0x45670123" -c "mww 0x40022004 0xCDEF89AB" -c "mww 0x40022008 0x45670123" -c "mww 0x40022008 0xCDEF89AB" -c "mww 0x40022010 0x220" -c "mww 0x40022010 0x260" -c "sleep 100" -c "mww 0x40022010 0x230" -c "mwh 0x1ffff800 0x5AA5" -c "sleep 1000" -c "mww 0x40022010 0x2220" -c "sleep 100" -c "mdw 0x40022010" -c "mdw 0x4002201c" -c "mdw 0x1ffff800" -c targets -c "halt" -c "stm32f2x unlock 0"
+openocd -f interface/stlink.cfg -f target/stm32f3x.cfg -c init -c "reset halt" -c "flash write_image erase build/hover.hex 0 ihex"
 ```
-```
-openocd -f interface/stlink-v2.cfg -f target/stm32f3x.cfg -c init -c "reset halt" -c "mww 0x40022004 0x45670123" -c "mww 0x40022004 0xCDEF89AB" -c "mww 0x40022008 0x45670123" -c "mww 0x40022008 0xCDEF89AB" -c targets -c "halt" -c "stm32f2x unlock 0"
 
-If using OpenOCD, you will probably encounter a problem with it not recognizing the AT32 as a STM32 ("Cannot identify target as a STM32 family"). You will need to modify and compile OpenOCD, like in https://github.com/bipropellant/bipropellant-hoverboard-firmware/issues/67#issuecomment-516657520 but for stm32f2x.c instead of stm32f1x.c.
-```
+If using OpenOCD, you will probably encounter a problem with it not recognizing the AT32 as a STM32 ("Cannot identify target as a STM32 family"). You will need to modify and compile OpenOCD, like in https://github.com/bipropellant/bipropellant-hoverboard-firmware/issues/67#issuecomment-516657520, however:
+- Use 0x240 instead of 0x242
+- Use "max_flash_size_in_kb = 256;" instead of "max_flash_size_in_kb = 512;"
+- You might was well modify the debug message to say ATF32F413 instead of ATF32F403
 
 ## Troubleshooting
 First, check that power is connected and voltage is >36V while flashing.
