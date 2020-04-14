@@ -3,14 +3,6 @@
 ######################################
 TARGET = hover
 
-ifneq "$(findstring AT32, $(MAKECMDGOALS))" ""
-TARGET_MCU = AT32
-else ifneq "$(findstring STM32, $(MAKECMDGOALS))" ""
-TARGET_MCU = STM32
-else
-TARGET_MCU = AT32
-endif
-
 ######################################
 # building variables
 ######################################
@@ -27,45 +19,31 @@ BUILD_DIR = build
 ######################################
 # C sources
 C_SOURCES =  \
-Drivers/Modified_HAL_Driver/Src/stm32f1xx_hal_flash.c \
-Drivers/Modified_HAL_Driver/Src/stm32f1xx_hal_flash_ex.c \
-Drivers/Modified_HAL_Driver/Src/stm32f1xx_hal_rcc.c \
-Drivers/Modified_HAL_Driver/Src/stm32f1xx_hal_tim.c \
-Drivers/Modified_HAL_Driver/Src/stm32f1xx_hal_tim_ex.c \
-Drivers/Modified_HAL_Driver/Src/stm32f1xx_hal_gpio_ex.c \
-Drivers/Modified_HAL_Driver/Src/stm32f1xx_hal_adc_ex.c \
-Drivers/Modified_HAL_Driver/Src/stm32f1xx_hal_cortex.c \
-Drivers/Modified_HAL_Driver/Src/stm32f1xx_hal_gpio.c \
-Drivers/Modified_HAL_Driver/Src/stm32f1xx_hal_rcc_ex.c \
-Drivers/Modified_HAL_Driver/Src/stm32f1xx_hal_pwr.c \
-Drivers/Modified_HAL_Driver/Src/stm32f1xx_hal.c \
-Drivers/Modified_HAL_Driver/Src/stm32f1xx_hal_adc.c \
-Drivers/Modified_HAL_Driver/Src/stm32f1xx_hal_uart.c \
-Drivers/Modified_HAL_Driver/Src/stm32f1xx_hal_i2c.c \
-Drivers/Modified_HAL_Driver/Src/stm32f1xx_hal_dma.c \
+Drivers/HAL_Driver/Src/at32f4xx_flash.c \
+Drivers/HAL_Driver/Src/at32f4xx_rcc.c \
+Drivers/HAL_Driver/Src/at32f4xx_tim.c \
+Drivers/HAL_Driver/Src/at32f4xx_gpio.c \
+Drivers/HAL_Driver/Src/at32f4xx_adc.c \
+Drivers/HAL_Driver/Src/at32f4xx_pwr.c \
+Drivers/HAL_Driver/Src/at32f4xx_usart.c \
+Drivers/HAL_Driver/Src/at32f4xx_i2c.c \
+Drivers/HAL_Driver/Src/at32f4xx_dma.c \
+Drivers/HAL_Driver/Src/at32f4xx_exti.c \
+Drivers/HAL_Driver/Src/misc.c \
 Src/setup.c \
 Src/control.c \
 Src/main.c \
 Src/bldc.c \
 Src/comms.c \
-Src/stm32f1xx_it.c \
+Src/at32f4xx_it.c \
 Src/BLDC_controller_data.c \
 Src/BLDC_controller.c \
-
-ifeq ($(TARGET_MCU), AT32)
-C_SOURCES := $(C_SOURCES) Src/system_at32f4xx.c
-else
-C_SOURCES := $(C_SOURCES) Src/system_stm32f1xx.c
-endif
+Src/system_at32f4xx.c
 
 # ASM sources
-ifeq ($(TARGET_MCU), AT32)
 ASM_SOURCES =  \
-startup_at32f403xe.s
-else
-ASM_SOURCES =  \
-startup_stm32f103xe.s
-endif
+startup_at32f413rx_hd.s
+
 
 #######################################
 # binaries
@@ -79,27 +57,18 @@ SZ = $(PREFIX)size
 HEX = $(CP) -O ihex
 BIN = $(CP) -O binary -S
 TOUCH = echo "" > 
-RM = del /q
+RM = rm
 
 #######################################
 # CFLAGS
 #######################################
 # cpu
-ifeq ($(TARGET_MCU),AT32)
 	CPU = -mcpu=cortex-m4
 
 	# fpu
 	FPU=-mfpu=fpv4-sp-d16
 	# float-abi
 	FLOAT-ABI=-mfloat-abi=softfp
-else
-	CPU = -mcpu=cortex-m3
-	# fpu
-	# NONE for Cortex-M0/M0+/M3
-
-	# float-abi
-endif
-
 
 # mcu
 MCU = $(CPU) -mthumb $(FPU) $(FLOAT-ABI)
@@ -109,15 +78,9 @@ MCU = $(CPU) -mthumb $(FPU) $(FLOAT-ABI)
 AS_DEFS =
 
 # C defines
-ifeq ($(TARGET_MCU), AT32)
 C_DEFS =  \
 -DUSE_HAL_DRIVER \
--DAT32F403Rx_HD
-else
-C_DEFS =  \
--DUSE_HAL_DRIVER \
--DSTM32F103xE
-endif
+-DAT32F413Rx_HD
 
 ifneq ("$(wildcard ./Inc/custom_config.h)","")
 	CUSTOM_CONFIG = 1
@@ -133,7 +96,7 @@ AS_INCLUDES =
 # C includes
 C_INCLUDES =  \
 -IInc \
--IDrivers/Modified_HAL_Driver/Inc \
+-IDrivers/HAL_Driver/Inc \
 -IDrivers/CMSIS/CM4/DeviceSupport \
 -IDrivers/CMSIS/CM4/CoreSupport \
 
@@ -157,11 +120,7 @@ CFLAGS += -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)"
 # LDFLAGS
 #######################################
 # link script
-ifeq ($(TARGET_MCU), AT32)
-LDSCRIPT = AT32F403RCTx_FLASH.ld
-else
-LDSCRIPT = STM32F103RCTx_FLASH.ld
-endif
+LDSCRIPT = AT32F413xC_FLASH.ld
 
 # libraries
 LIBS = -lc -lm -lnosys
@@ -169,37 +128,12 @@ LIBDIR =
 LDFLAGS = $(MCU) -specs=nano.specs -T$(LDSCRIPT) $(LIBDIR) $(LIBS) -Wl,-Map=$(BUILD_DIR)/$(TARGET).map,--cref -Wl,--gc-sections
 
 # default action: build all
-all: post-build
-
-pre-build: 
-	@echo Build for target [$(TARGET_MCU)] 
-	@echo Using custom configuration [$(CUSTOM_CONFIG)]
-ifeq ($(TARGET_MCU), AT32)
-ifneq ("$(wildcard ./build/target_stm32)","")
-	@echo Found files from a previous compilation for STM32, clean them up now
-	$(RM) build\*
-	$(TOUCH) ./build/target_at32
-endif
-ifeq ("$(wildcard ./build/target_at32)","")
-	@echo Create target lock file for AT32
-	$(TOUCH) ./build/target_at32
-endif
-else
-ifneq ("$(wildcard ./build/target_at32)","")
-	@echo Found files from a previous compilation for AT32, clean them up now
-	$(RM) build\*
-	$(TOUCH) ./build/target_stm32
-endif
-ifeq ("$(wildcard ./build/target_stm32)","")
-	@echo Create target lock file for STM32
-	$(TOUCH) ./build/target_stm32
-endif
-endif		
+all: post-build	
 
 post-build: main-build
 	@echo POST
 
-main-build: pre-build $(BUILD_DIR)/$(TARGET).elf $(BUILD_DIR)/$(TARGET).hex $(BUILD_DIR)/$(TARGET).bin
+main-build: $(BUILD_DIR)/$(TARGET).elf $(BUILD_DIR)/$(TARGET).hex $(BUILD_DIR)/$(TARGET).bin
 #@$(MAKE) --no-print-directory target
 
 target: $(BUILD_DIR)/$(TARGET).elf $(BUILD_DIR)/$(TARGET).hex $(BUILD_DIR)/$(TARGET).bin
@@ -215,7 +149,7 @@ OBJECTS += $(addprefix $(BUILD_DIR)/,$(notdir $(ASM_SOURCES:.s=.o)))
 vpath %.s $(sort $(dir $(ASM_SOURCES)))
 
 $(BUILD_DIR)/%.o: %.c Inc/config.h Makefile | $(BUILD_DIR)
-	$(CC) -c $(CFLAGS) -Wa,-a,-ad,-alms=$(BUILD_DIR)/$(notdir $(<:.c=.lst)) $< -o $@ -include Inc/stm32f1xx_hal_conf.h
+	$(CC) -c $(CFLAGS) -Wa,-a,-ad,-alms=$(BUILD_DIR)/$(notdir $(<:.c=.lst)) $< -o $@ -include Inc/at32f4xx_conf.h
 
 $(BUILD_DIR)/%.o: %.s Inc/config.h Makefile | $(BUILD_DIR)
 	$(AS) -c $(CFLAGS) $< -o $@
@@ -239,7 +173,7 @@ format:
 # clean up
 #######################################
 clean:
-	-rm -fR .dep $(BUILD_DIR)
+	-rm -fR .dep $(BUILD_DIR)/*
 
 flash:
 	st-flash --reset write $(BUILD_DIR)/$(TARGET).bin 0x8000000
@@ -249,13 +183,6 @@ flash-jlink:
 
 unlock:
 	openocd -f interface/stlink-v2.cfg -f target/stm32f1x.cfg -c init -c "reset halt" -c "stm32f1x unlock 0"
-
-#empty target for MCU selection
-AT32: all
-	@echo Build for target [$(TARGET_MCU)] 
-	
-STM32: all
-	@echo Build for target [$(TARGET_MCU)] 
 
 #######################################
 # dependencies

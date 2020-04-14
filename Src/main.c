@@ -19,11 +19,10 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "stm32f1xx_hal.h"
+#include "at32f4xx.h"
 #include "defines.h"
 #include "setup.h"
 #include "config.h"
-//#include "hd44780.h"
 
 // ###############################################################################
 #include "BLDC_controller.h"            /* Model's header file */
@@ -48,14 +47,7 @@ ExtY rtY_Right;                  /* External outputs */
 
 void SystemClock_Config(void);
 
-extern TIM_HandleTypeDef htim_left;
-extern TIM_HandleTypeDef htim_right;
-extern ADC_HandleTypeDef hadc1;
-extern ADC_HandleTypeDef hadc2;
 extern volatile adc_buf_t adc_buffer;
-//LCD_PCF8574_HandleTypeDef lcd;
-extern I2C_HandleTypeDef hi2c2;
-extern UART_HandleTypeDef huart2;
 
 #ifdef DEBUG_I2C_LCD
 extern I2C_HandleTypeDef hi2c2;
@@ -98,6 +90,9 @@ extern uint8_t enable; // global variable for motor enable
 extern volatile uint32_t timeout; // global variable for timeout
 extern float batteryVoltage; // global variable for battery voltage
 
+// TODO: do this better
+extern volatile uint32_t systick_counter;
+
 uint32_t inactivity_timeout_counter;
 
 #ifdef CONTROL_NUNCHUCK
@@ -134,43 +129,52 @@ extern volatile uint8_t hall_idx_right;
 int milli_vel_error_sum = 0;
 
 
+uint32_t millis(void) {
+  return systick_counter;
+}
+
+void delay(uint32_t millis) {
+  uint32_t start = systick_counter;
+  while ((systick_counter - start) < millis)
+  {
+    // do nothing
+  }
+}
+
 void poweroff() {
     if (ABS(speed) < 20) {
         buzzerPattern = 0;
         enable = 0;
         for (int i = 0; i < 8; i++) {
             buzzerFreq = i;
-            HAL_Delay(100);
+            delay(100);
         }
-        HAL_GPIO_WritePin(OFF_PORT, OFF_PIN, 0);
+        GPIO_WriteBit(OFF_PORT, OFF_PIN, 0);
         while(1) {}
     }
 }
 
 
 int main(void) {
-  HAL_Init();
-
-  __HAL_RCC_AFIO_CLK_ENABLE();
-  HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
+  RCC_APB2PeriphClockCmd(RCC_APB2PERIPH_AFIO, ENABLE);
   /* System interrupt init*/
   /* MemoryManagement_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(MemoryManagement_IRQn, 0, 0);
+  NVIC_SetPriority(MemoryManagement_IRQn, 0);
   /* BusFault_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(BusFault_IRQn, 0, 0);
+  NVIC_SetPriority(BusFault_IRQn, 0);
   /* UsageFault_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(UsageFault_IRQn, 0, 0);
+  NVIC_SetPriority(UsageFault_IRQn, 0);
   /* SVCall_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(SVCall_IRQn, 0, 0);
+  NVIC_SetPriority(SVCall_IRQn, 0);
   /* DebugMonitor_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DebugMonitor_IRQn, 0, 0);
+  NVIC_SetPriority(DebugMonitor_IRQn, 0);
   /* PendSV_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(PendSV_IRQn, 0, 0);
+  NVIC_SetPriority(PendSV_IRQn, 0);
   /* SysTick_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
+  NVIC_SetPriority(SysTick_IRQn, 0);
 
   SystemClock_Config();
-  __HAL_RCC_DMA1_CLK_DISABLE();
+  RCC_AHBPeriphClockCmd(RCC_AHBPERIPH_DMA1, DISABLE);
 
   MX_GPIO_Init();
   MX_TIM_Init();
@@ -181,10 +185,10 @@ int main(void) {
     UART_Init();
   #endif
 
-  HAL_GPIO_WritePin(OFF_PORT, OFF_PIN, 1);
+  GPIO_WriteBit(OFF_PORT, OFF_PIN, 1);
 
-  HAL_ADC_Start(&hadc1);
-  HAL_ADC_Start(&hadc2);
+  ADC_ExternalTrigConvCtrl(ADC1, ENABLE);
+  ADC_SoftwareStartConvCtrl(ADC2, ENABLE);
 
 // Matlab Init
 // ###############################################################################
@@ -212,11 +216,11 @@ int main(void) {
 
   for (int i = 8; i >= 0; i--) {
     buzzerFreq = i;
-    HAL_Delay(100);
+    delay(100);
   }
   buzzerFreq = 0;
 
-  HAL_GPIO_WritePin(LED_PORT, LED_PIN, 1);
+  GPIO_WriteBit(LED_PORT, LED_PIN, 1);
 
   #if defined (CONTROL_MOTOR_TEST) || defined (CONTROL_DETECT_HALL)
   #else
@@ -244,7 +248,7 @@ int main(void) {
 
   #ifdef DEBUG_I2C_LCD
     I2C_Init();
-    HAL_Delay(50);
+    delay(50);
     lcd.pcf8574.PCF_I2C_ADDRESS = 0x27;
       lcd.pcf8574.PCF_I2C_TIMEOUT = 5;
       lcd.pcf8574.i2c = hi2c2;
@@ -257,7 +261,7 @@ int main(void) {
       }
 
     LCD_ClearDisplay(&lcd);
-    HAL_Delay(5);
+    delay(5);
     LCD_SetLocation(&lcd, 0, 0);
     LCD_WriteString(&lcd, "Hover V2.0");
     LCD_SetLocation(&lcd, 0, 1);
@@ -270,7 +274,7 @@ int main(void) {
   enable = 1;  // enable motors
 
   while(1) {
-    HAL_Delay(DELAY_IN_MAIN_LOOP); //delay in ms
+    delay(DELAY_IN_MAIN_LOOP); //delay in ms
 
     #ifdef CONTROL_NUNCHUCK
       Nunchuck_Read();
@@ -467,9 +471,9 @@ int main(void) {
 
 
     // ####### POWEROFF BY POWER-BUTTON #######
-    if (HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN)) {
+    if (GPIO_ReadInputDataBit(BUTTON_PORT, BUTTON_PIN)) {
       enable = 0;
-      while (HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN)) {}
+      while (GPIO_ReadInputDataBit(BUTTON_PORT, BUTTON_PIN)) {}
       poweroff();
     }
 
@@ -510,49 +514,6 @@ int main(void) {
 /** System Clock Configuration
 */
 void SystemClock_Config(void) {
-#ifndef AT32F403Rx_HD
-  RCC_OscInitTypeDef RCC_OscInitStruct;
-  RCC_ClkInitTypeDef RCC_ClkInitStruct;
-  RCC_PeriphCLKInitTypeDef PeriphClkInit;
-
-  /**Initializes the CPU, AHB and APB busses clocks
-    */
-// #ifndef AT32F403Rx_HD
-//Is automatically set at startup in SystemConfig 
-  RCC_OscInitStruct.OscillatorType      = RCC_OSCILLATORTYPE_HSI;
-  RCC_OscInitStruct.HSIState            = RCC_HSI_ON;
-  RCC_OscInitStruct.HSICalibrationValue = 16;
-  RCC_OscInitStruct.PLL.PLLState        = RCC_PLL_ON;
-  RCC_OscInitStruct.PLL.PLLSource       = RCC_PLLSOURCE_HSI_DIV2;
-  RCC_OscInitStruct.PLL.PLLMUL          = RCC_PLL_MUL16;
-  HAL_RCC_OscConfig(&RCC_OscInitStruct);
-  /**Initializes the CPU, AHB and APB busses clocks
-    */
-  RCC_ClkInitStruct.ClockType      = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
-  RCC_ClkInitStruct.SYSCLKSource   = RCC_SYSCLKSOURCE_PLLCLK;
-  RCC_ClkInitStruct.AHBCLKDivider  = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
-  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
-	
-
-	// HAL_RCC_ClockConfig(&RCC_ClkInitStruct, 0);
-// #else
-  HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2);
-
-  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_ADC;
-  PeriphClkInit.AdcClockSelection    = RCC_ADCPCLK2_DIV8;  // 8 MHz
-  HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit);
-#endif
-  /**Configure the Systick interrupt time
-    */
-  HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq() / 1000);
-
-  /**Configure the Systick
-    */
-// #ifndef AT32F403Rx_HD
-	//seems to not be available on AT32
-  HAL_SYSTICK_CLKSourceConfig(SYSTICK_CLKSOURCE_HCLK);
-// #endif
-  /* SysTick_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
+  SysTick_Config(SystemCoreClock / 1000); // tick every 1 millisecond
+  NVIC_SetPriority(SysTick_IRQn, 0);
 }

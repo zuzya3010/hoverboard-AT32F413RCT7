@@ -1,11 +1,9 @@
-#include "stm32f1xx_hal.h"
+#include <stdio.h>
+#include <string.h>
+#include "at32f4xx.h"
 #include "defines.h"
 #include "setup.h"
 #include "config.h"
-#include "stdio.h"
-#include "string.h"
-
-UART_HandleTypeDef huart2;
 
 #ifdef DEBUG_SERIAL_USART3
 #define UART_DMA_CHANNEL DMA1_Channel2
@@ -58,7 +56,9 @@ void consoleScope() {
   #endif
 }
 
+#ifdef DEBUG_SERIAL_USART2
 void consoleLog(char *message)
 {
     HAL_UART_Transmit_DMA(&huart2, (uint8_t *)message, strlen(message));
 }
+#endif // DEBUG_SERIAL_USART2

@@ -1,5 +1,5 @@
 #pragma once
-#include "stm32f1xx_hal.h"
+#include "at32f4xx.h"
 
 
 // ############################### DO-NOT-TOUCH SETTINGS ###############################
@@ -52,12 +52,14 @@
 
 // ############################### SERIAL DEBUG ###############################
 
-#define DEBUG_SERIAL_USART3         // right sensor board cable, disable if I2C (nunchuck or lcd) is used!
-#define DEBUG_BAUD       115200     // UART baud rate
+//#define DEBUG_SERIAL_USART3         // right sensor board cable, disable if I2C (nunchuck or lcd) is used!
+//#define DEBUG_BAUD       115200     // UART baud rate
 //#define DEBUG_SERIAL_SERVOTERM
-#define DEBUG_SERIAL_ASCII          // "1:345 2:1337 3:0 4:0 5:0 6:0 7:0 8:0\r\n"
+//#define DEBUG_SERIAL_ASCII          // "1:345 2:1337 3:0 4:0 5:0 6:0 7:0 8:0\r\n"
 
 // ############################### INPUT ###############################
+
+#define CONTROL_MOTOR_TEST
 
 // ###### CONTROL VIA UART (serial) ######
 //#define CONTROL_SERIAL_USART2       // left sensor board cable, disable if ADC or PPM is used!
@@ -66,9 +68,9 @@
 
 // ###### CONTROL VIA RC REMOTE ######
 // left sensor board cable. Channel 1: steering, Channel 2: speed.
-#define CONTROL_PPM                 // use PPM-Sum as input. disable CONTROL_SERIAL_USART2!
-#define PPM_NUM_CHANNELS 8          // total number of PPM channels to receive, even if they are not used.
-#define PPM_DEAD_BAND 5			// dead band around 500
+//#define CONTROL_PPM                 // use PPM-Sum as input. disable CONTROL_SERIAL_USART2!
+//#define PPM_NUM_CHANNELS 8          // total number of PPM channels to receive, even if they are not used.
+//#define PPM_DEAD_BAND 5			// dead band around 500
 
 // ###### CONTROL VIA TWO POTENTIOMETERS ######
 // ADC-calibration to cover the full poti-range: connect potis to left sensor board cable (0 to 3.3V) (do NOT use the red 15V wire in the cable!). see <How to calibrate>. turn the potis to minimum position, write value 1 to ADC1_MIN and value 2 to ADC2_MIN. turn to maximum position and repeat it for ADC?_MAX. make, flash and test it.

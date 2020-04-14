@@ -22,7 +22,7 @@
 * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "stm32f1xx_hal.h"
+#include "at32f4xx.h"
 #include "defines.h"
 #include "setup.h"
 #include "config.h"
@@ -75,9 +75,9 @@ float batteryVoltage = BAT_NUMBER_OF_CELLS * 4.0;
 //=640 cpu cycles
 void DMA1_Channel1_IRQHandler(void) {
 
-  DMA1->IFCR = DMA_IFCR_CTCIF1;
-  // HAL_GPIO_WritePin(LED_PORT, LED_PIN, 1);
-  // HAL_GPIO_TogglePin(LED_PORT, LED_PIN);
+  DMA1->ICLR = DMA_ICLR_CTCIF1;
+  // GPIO_WriteBit(LED_PORT, LED_PIN, 1);
+  // GPIO_WriteBit(LED_PORT, LED_PIN, 0);
 
   if(offsetcount < 1000) {  // calibrate ADC offsets
     offsetcount++;
@@ -96,27 +96,27 @@ void DMA1_Channel1_IRQHandler(void) {
 
   //disable PWM when current limit is reached (current chopping)
   if(ABS((adc_buffer.dcl - offsetdcl) * MOTOR_AMP_CONV_DC_AMP) > DC_CUR_LIMIT || timeout > TIMEOUT || enable == 0) {
-    LEFT_TIM->BDTR &= ~TIM_BDTR_MOE;
-    //HAL_GPIO_WritePin(LED_PORT, LED_PIN, 1);
+    TMR_CtrlPWMOutputs(LEFT_TIM, DISABLE);
+    //GPIO_WriteBit(LED_PORT, LED_PIN, 1);
   } else {
-    LEFT_TIM->BDTR |= TIM_BDTR_MOE;
-    //HAL_GPIO_WritePin(LED_PORT, LED_PIN, 0);
+    TMR_CtrlPWMOutputs(LEFT_TIM, ENABLE);
+    //GPIO_WriteBit(LED_PORT, LED_PIN, 0);
   }
 
   if(ABS((adc_buffer.dcr - offsetdcr) * MOTOR_AMP_CONV_DC_AMP)  > DC_CUR_LIMIT || timeout > TIMEOUT || enable == 0) {
-    RIGHT_TIM->BDTR &= ~TIM_BDTR_MOE;
+    TMR_CtrlPWMOutputs(RIGHT_TIM, DISABLE);
   } else {
-    RIGHT_TIM->BDTR |= TIM_BDTR_MOE;
+    TMR_CtrlPWMOutputs(RIGHT_TIM, ENABLE);
   }
 
   //create square wave for buzzer
   buzzerTimer++;
   if (buzzerFreq != 0 && (buzzerTimer / 5000) % (buzzerPattern + 1) == 0) {
     if (buzzerTimer % buzzerFreq == 0) {
-      HAL_GPIO_TogglePin(BUZZER_PORT, BUZZER_PIN);
+      GPIO_WriteBit(BUZZER_PORT, BUZZER_PIN, !GPIO_ReadOutputDataBit(BUZZER_PORT, BUZZER_PIN));
     }
   } else {
-      HAL_GPIO_WritePin(BUZZER_PORT, BUZZER_PIN, 0);
+      GPIO_WriteBit(BUZZER_PORT, BUZZER_PIN, 0);
   }
 
   // ############################### MOTOR CONTROL ###############################
@@ -132,9 +132,9 @@ void DMA1_Channel1_IRQHandler(void) {
   int ur, vr, wr;
   // ========================= LEFT MOTOR ============================ 
     // Get hall sensors values
-    uint8_t hall_ul = !(LEFT_HALL_U_PORT->IDR & LEFT_HALL_U_PIN);
-    uint8_t hall_vl = !(LEFT_HALL_V_PORT->IDR & LEFT_HALL_V_PIN);
-    uint8_t hall_wl = !(LEFT_HALL_W_PORT->IDR & LEFT_HALL_W_PIN);
+    uint8_t hall_ul = !(LEFT_HALL_U_PORT->IPTDT & LEFT_HALL_U_PIN);
+    uint8_t hall_vl = !(LEFT_HALL_V_PORT->IPTDT & LEFT_HALL_V_PIN);
+    uint8_t hall_wl = !(LEFT_HALL_W_PORT->IPTDT & LEFT_HALL_W_PIN);
 
     /* Set motor inputs here */
     rtU_Left.b_hallA   = hall_ul;
@@ -161,9 +161,9 @@ void DMA1_Channel1_IRQHandler(void) {
 
   // ========================= RIGHT MOTOR ===========================  
     // Get hall sensors values
-    uint8_t hall_ur = !(RIGHT_HALL_U_PORT->IDR & RIGHT_HALL_U_PIN);
-    uint8_t hall_vr = !(RIGHT_HALL_V_PORT->IDR & RIGHT_HALL_V_PIN);
-    uint8_t hall_wr = !(RIGHT_HALL_W_PORT->IDR & RIGHT_HALL_W_PIN);
+    uint8_t hall_ur = !(RIGHT_HALL_U_PORT->IPTDT & RIGHT_HALL_U_PIN);
+    uint8_t hall_vr = !(RIGHT_HALL_V_PORT->IPTDT & RIGHT_HALL_V_PIN);
+    uint8_t hall_wr = !(RIGHT_HALL_W_PORT->IPTDT & RIGHT_HALL_W_PIN);
 
     /* Set motor inputs here */
     rtU_Right.b_hallA  = hall_ur;
