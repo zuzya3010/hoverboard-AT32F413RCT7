@@ -68,7 +68,37 @@ static int offsetrr2   = 2000;
 static int offsetdcl   = 2000;
 static int offsetdcr   = 2000;
 
+volatile uint8_t hall_idx_left;
+volatile uint8_t hall_idx_right;
+
 float batteryVoltage = BAT_NUMBER_OF_CELLS * 4.0;
+
+// map hall sensor values based on one of 6 possible mappings
+void hall_map(uint8_t *hall_values, uint8_t mapping)
+{
+  uint8_t out[3];
+  switch(mapping) {
+  case 0:
+    out[0] = hall_values[0]; out[1] = hall_values[1]; out[2] = hall_values[2];
+    break;
+  case 1:
+    out[0] = hall_values[0]; out[1] = hall_values[2]; out[2] = hall_values[1];
+    break;
+  case 2:
+    out[0] = hall_values[1]; out[1] = hall_values[0]; out[2] = hall_values[2];
+    break;
+  case 3:
+    out[0] = hall_values[1]; out[1] = hall_values[2]; out[2] = hall_values[0];
+    break;
+  case 4:
+    out[0] = hall_values[2]; out[1] = hall_values[0]; out[2] = hall_values[1];
+    break;
+  case 5:
+    out[0] = hall_values[2]; out[1] = hall_values[1]; out[2] = hall_values[0];
+    break;
+  }
+  hall_values[0] = out[0]; hall_values[1] = out[1]; hall_values[2] = out[2];
+}
 
 //scan 8 channels with 2ADCs @ 20 clk cycles per sample
 //meaning ~80 ADC clock cycles @ 8MHz until new DMA interrupt =~ 100KHz
@@ -132,14 +162,16 @@ void DMA1_Channel1_IRQHandler(void) {
   int ur, vr, wr;
   // ========================= LEFT MOTOR ============================ 
     // Get hall sensors values
-    uint8_t hall_ul = !(LEFT_HALL_U_PORT->IPTDT & LEFT_HALL_U_PIN);
-    uint8_t hall_vl = !(LEFT_HALL_V_PORT->IPTDT & LEFT_HALL_V_PIN);
-    uint8_t hall_wl = !(LEFT_HALL_W_PORT->IPTDT & LEFT_HALL_W_PIN);
+    uint8_t hall_sensors[3];
+    hall_sensors[0] = !(LEFT_HALL_U_PORT->IPTDT & LEFT_HALL_U_PIN);
+    hall_sensors[1] = !(LEFT_HALL_W_PORT->IPTDT & LEFT_HALL_W_PIN);
+    hall_sensors[2] = !(LEFT_HALL_V_PORT->IPTDT & LEFT_HALL_V_PIN);
+    hall_map(hall_sensors, hall_idx_left);
 
     /* Set motor inputs here */
-    rtU_Left.b_hallA   = hall_ul;
-    rtU_Left.b_hallB   = hall_vl;
-    rtU_Left.b_hallC   = hall_wl;
+    rtU_Left.b_hallA   = hall_sensors[0];
+    rtU_Left.b_hallB   = hall_sensors[1];
+    rtU_Left.b_hallC   = hall_sensors[2];
     rtU_Left.r_DC      = pwml;
     
     /* Step the controller */
@@ -161,14 +193,15 @@ void DMA1_Channel1_IRQHandler(void) {
 
   // ========================= RIGHT MOTOR ===========================  
     // Get hall sensors values
-    uint8_t hall_ur = !(RIGHT_HALL_U_PORT->IPTDT & RIGHT_HALL_U_PIN);
-    uint8_t hall_vr = !(RIGHT_HALL_V_PORT->IPTDT & RIGHT_HALL_V_PIN);
-    uint8_t hall_wr = !(RIGHT_HALL_W_PORT->IPTDT & RIGHT_HALL_W_PIN);
+    hall_sensors[0] = !(RIGHT_HALL_U_PORT->IPTDT & RIGHT_HALL_U_PIN);
+    hall_sensors[1] = !(RIGHT_HALL_V_PORT->IPTDT & RIGHT_HALL_V_PIN);
+    hall_sensors[2] = !(RIGHT_HALL_W_PORT->IPTDT & RIGHT_HALL_W_PIN);
+    hall_map(hall_sensors, hall_idx_right);
 
     /* Set motor inputs here */
-    rtU_Right.b_hallA  = hall_ur;
-    rtU_Right.b_hallB  = hall_vr;
-    rtU_Right.b_hallC  = hall_wr;
+    rtU_Right.b_hallA  = hall_sensors[0];
+    rtU_Right.b_hallB  = hall_sensors[1];
+    rtU_Right.b_hallC  = hall_sensors[2];
     rtU_Right.r_DC     = pwmr;
 
     /* Step the controller */

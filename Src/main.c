@@ -122,9 +122,9 @@ typedef struct
 } motor_test_admin;
 
 motor_test_admin tst_admin = {0,0,1000/DELAY_IN_MAIN_LOOP,5,0,0};
+#endif
 extern volatile uint8_t hall_idx_left;
 extern volatile uint8_t hall_idx_right;
-#endif
 
 int milli_vel_error_sum = 0;
 
@@ -156,6 +156,9 @@ void poweroff() {
 
 
 int main(void) {
+  hall_idx_left = CONFIG_HALL_IDX_LEFT;
+  hall_idx_right = CONFIG_HALL_IDX_RIGHT;
+
   RCC_APB2PeriphClockCmd(RCC_APB2PERIPH_AFIO, ENABLE);
   /* System interrupt init*/
   /* MemoryManagement_IRQn interrupt configuration */
@@ -347,6 +350,7 @@ int main(void) {
     //keep activity timeout happy
     speedR = 100;
     speedL = 100;
+    timeout = 0;
 
     //update timer
     tst_admin.time++;
@@ -495,8 +499,10 @@ int main(void) {
       buzzerFreq = 5;
       buzzerPattern = 1;
     } else {  // do not beep
+#ifndef CONTROL_DETECT_HALL
       buzzerFreq = 0;
       buzzerPattern = 0;
+#endif
     }
 
 

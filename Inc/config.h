@@ -60,6 +60,7 @@
 // ############################### INPUT ###############################
 
 #define CONTROL_MOTOR_TEST
+//#define CONTROL_DETECT_HALL
 
 // ###### CONTROL VIA UART (serial) ######
 //#define CONTROL_SERIAL_USART2       // left sensor board cable, disable if ADC or PPM is used!
@@ -103,8 +104,8 @@
 // 1-6 representing the 6 possible ways to map the hall sensors to the motors
 // a wrong setting will result in a not or badly turning motor. Use the MOTOR_TEST
 // control method to find the right setting for your board.
-#define HALL_IDX_LEFT      2
-#define HALL_IDX_RIGHT     5
+#define CONFIG_HALL_IDX_LEFT      0
+#define CONFIG_HALL_IDX_RIGHT     4
 
 // ############################### DRIVING BEHAVIOR ###############################
 
@@ -120,7 +121,7 @@
 #define SPEED_COEFFICIENT   1.0  // higher value == stronger. 0.0 to ~2.0?
 #define STEER_COEFFICIENT   0.5  // higher value == stronger. if you do not want any steering, set it to 0.0; 0.0 to 1.0
 //#define INVERT_R_DIRECTION
-#define INVERT_L_DIRECTION
+//#define INVERT_L_DIRECTION
 #define BEEPS_BACKWARD 0    // 0 or 1
 
 //Turbo boost at high speeds while button1 is pressed:
