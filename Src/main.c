@@ -146,7 +146,11 @@ void poweroff() {
         buzzerPattern = 0;
         enable = 0;
         for (int i = 0; i < 8; i++) {
+#ifdef QUIET_MODE
+            GPIO_WriteBit(LED_PORT, LED_PIN, i & 1);
+#else
             buzzerFreq = i;
+#endif
             delay(100);
         }
         GPIO_WriteBit(OFF_PORT, OFF_PIN, 0);
@@ -218,7 +222,11 @@ int main(void) {
 
 
   for (int i = 8; i >= 0; i--) {
+#ifdef QUIET_MODE
+    GPIO_WriteBit(LED_PORT, LED_PIN, i & 1);
+#else
     buzzerFreq = i;
+#endif
     delay(100);
   }
   buzzerFreq = 0;
@@ -379,7 +387,11 @@ int main(void) {
 				if(tst_admin.beep_on)
 				{
 					//turn buzzer off, increment beep_cnt, and set new timeout
-					buzzerFreq = 0;
+          #ifdef QUIET_MODE
+            GPIO_WriteBit(LED_PORT, LED_PIN, 0);
+          #else
+					  buzzerFreq = 0;
+          #endif
 					tst_admin.beep_on = 0;
 					tst_admin.beep_cnt++;
 					tst_admin.timeout = tst_admin.time + 300/DELAY_IN_MAIN_LOOP;
@@ -404,7 +416,11 @@ int main(void) {
 					}
 					else
 					{
-						buzzerFreq = 16;
+            #ifdef QUIET_MODE
+              GPIO_WriteBit(LED_PORT, LED_PIN, 1);
+            #else
+						  buzzerFreq = 16;
+            #endif
 						tst_admin.beep_on = 1;
 						tst_admin.timeout = tst_admin.time + 100/DELAY_IN_MAIN_LOOP;
 					}

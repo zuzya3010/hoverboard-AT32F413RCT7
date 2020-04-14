@@ -44,6 +44,11 @@
 #define TEMP_POWEROFF_ENABLE    0         // to poweroff or not to poweroff, 1 or 0, DO NOT ACTIVITE WITHOUT CALIBRATION!
 #define TEMP_POWEROFF           65        // overheat poweroff. (while not driving) [°C]
 
+// Quiet mode will, most of the time, flash the LED instead of using the
+// buzzer. However the buzzer will always be used when in a dangerous
+// situation like low battery or overheating.
+#define QUIET_MODE              1         // whether to flash LED instead of beeping
+
 #define INACTIVITY_TIMEOUT 8        // minutes of not driving until poweroff. it is not very precise.
 
 // ############################### LCD DEBUG ###############################
