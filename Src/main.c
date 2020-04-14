@@ -329,6 +329,7 @@ int main(void) {
     //keep activity timeout happy
     speedR = 100;
     speedL = 100;
+    timeout = 0;
 
 	#ifdef INVERT_R_DIRECTION
 	  pwmr = 60;
