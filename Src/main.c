@@ -23,6 +23,7 @@
 #include "defines.h"
 #include "setup.h"
 #include "config.h"
+#include "control.h"
 
 // ###############################################################################
 #include "BLDC_controller.h"            /* Model's header file */
@@ -247,6 +248,10 @@ int main(void) {
     PPM_Init();
   #endif
 
+  #ifdef CONTROL_PWM
+    PWM_Init();
+  #endif
+
   #ifdef CONTROL_NUNCHUCK
     I2C_Init();
     Nunchuck_Init();
@@ -312,6 +317,30 @@ int main(void) {
 	  local_steer_coefficent = ppm_captured_value[4] / 1000.0f;
     #endif
 
+    #ifdef CONTROL_PWM
+
+    if (PWM_Read()) {
+      if (ABS(pwm_channel[0] - PWM_CENTER) > PWM_DEAD_BAND) {
+        cmd1 = (pwm_channel[0] - PWM_CENTER) * 2;
+        cmd1 = CLAMP(cmd1, -1000, 1000);
+      }
+      else {
+        cmd1 = 0;
+      }
+      if (ABS(pwm_channel[1] - PWM_CENTER) > PWM_DEAD_BAND) {
+        cmd2 = (pwm_channel[1] - PWM_CENTER) * 2;
+        cmd2 = CLAMP(cmd2, -1000, 1000);
+      } else {
+        cmd2 = 0;
+      }
+
+      timeout = 0;
+    } else {
+      cmd1 = 0;
+      cmd2 = 0;
+    }
+    #endif
+
     #ifdef CONTROL_ADC
       // ADC values range: 0-4095, see ADC-calibration in config.h
       cmd1 = CLAMP(adc_buffer.l_tx2 - ADC1_MIN, 0, ADC1_MAX) / (ADC1_MAX / 1000.0f);  // ADC1
@@ -331,10 +360,16 @@ int main(void) {
       timeout = 0;
     #endif
 
-
     // ####### LOW-PASS FILTER #######
-    steer = steer * (1.0 - FILTER) + cmd1 * FILTER;
-    speed = speed * (1.0 - FILTER) + cmd2 * FILTER;
+    #ifndef CONTROL_PWM
+      steer = steer * (1.0 - FILTER) + cmd1 * FILTER;
+      speed = speed * (1.0 - FILTER) + cmd2 * FILTER;
+    #else
+      // In PWM control mode the channels directly control the motors i.e.
+      // there's no mixing
+      speedL = speedL * (1.0 - FILTER) + cmd1 * FILTER;
+      speedR = speedR * (1.0 - FILTER) + cmd2 * FILTER;
+    #endif
 
 #ifdef CONTROL_MOTOR_TEST
     //keep activity timeout happy
@@ -444,9 +479,11 @@ int main(void) {
 
 #else
 
-    // ####### MIXER #######
-    speedR = CLAMP(speed * local_speed_coefficent -  steer * local_steer_coefficent, -1000, 1000);
-    speedL = CLAMP(speed * local_speed_coefficent +  steer * local_steer_coefficent, -1000, 1000);
+    #ifndef CONTROL_PWM
+      // ####### MIXER #######
+      speedR = CLAMP(speed * local_speed_coefficent -  steer * local_steer_coefficent, -1000, 1000);
+      speedL = CLAMP(speed * local_speed_coefficent +  steer * local_steer_coefficent, -1000, 1000);
+    #endif
 
     #ifdef ADDITIONAL_CODE
       ADDITIONAL_CODE;

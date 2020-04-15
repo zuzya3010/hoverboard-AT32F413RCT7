@@ -21,27 +21,17 @@
 
 #pragma once
 
-#include "at32f4xx.h"
+#include <stdbool.h>
 #include "config.h"
 
-void MX_GPIO_Init(void);
-void MX_TIM_Init(void);
-void MX_ADC1_Init(void);
-void MX_ADC2_Init(void);
-void UART_Init(void);
-
 #ifdef CONTROL_PPM
-void PPM_Init();
-void PPM_ISR_Callback();
-void PPM_SysTick_Callback();
+extern void PPM_SysTick_Callback();
 #endif
 
 #ifdef CONTROL_PWM
-void PWM_Init();
-#endif
+#define MAX_PWM_CHANNELS 8
+extern uint16_t pwm_channel[MAX_PWM_CHANNELS];
 
-void Nunchuck_Init();
-void Nunchuck_Read();
-void consoleScope();
-void consoleLog(char *message);
-void setScopeChannel(uint8_t ch, int16_t val);
+extern void PWM_EXTI_Callback(unsigned int channel, unsigned int level);
+extern bool PWM_Read();
+#endif

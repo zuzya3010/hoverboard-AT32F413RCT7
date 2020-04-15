@@ -194,6 +194,54 @@ void UART_Init() {
 }
 #endif
 
+#ifdef CONTROL_PWM
+void PWM_Init() {
+  TMR_TimerBaseInitType TMR_TimeBaseInitStruct = {0};
+  GPIO_InitType GPIO_InitStruct = {0};
+  EXTI_InitType EXTI_InitStruct = {0};
+
+  RCC_APB2PeriphClockCmd(RCC_APB2PERIPH_GPIOC, ENABLE);
+  RCC_APB2PeriphClockCmd(RCC_APB2PERIPH_AFIO, ENABLE);
+  RCC_APB1PeriphClockCmd(RCC_APB1PERIPH_TMR2, ENABLE);
+
+  // Set up TMR2 to count microseconds
+  TMR_SelectPlusMode(TMR2, TMR_Plus_Mode_Enable);
+  TMR_TimeBaseStructInit(&TMR_TimeBaseInitStruct);
+  // APB1 clock is HCLK/2, but TIM2CLK is fed by a x2 multiplier connected
+  // to APB1 clock, so the timer ticks at HCLK
+  TMR_TimeBaseInitStruct.TMR_DIV = (SystemCoreClock / 1000000) - 1;
+  TMR_TimeBaseInitStruct.TMR_CounterMode = TMR_CounterDIR_Up;
+  TMR_TimeBaseInitStruct.TMR_Period = 0xffffffff;
+  TMR_TimeBaseInitStruct.TMR_ClockDivision = TMR_CKD_DIV1;
+  TMR_TimeBaseInitStruct.TMR_RepetitionCounter = 0;
+  TMR_TimeBaseInit(TMR2, &TMR_TimeBaseInitStruct);
+  TMR_Cmd(TMR2, ENABLE);
+
+  // Set up PC13 and PC14 to trigger interrupts when the input changes
+  GPIO_InitStruct.GPIO_MaxSpeed = GPIO_MaxSpeed_2MHz;
+	GPIO_InitStruct.GPIO_Pins = GPIO_Pins_13 | GPIO_Pins_14;
+	GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN_PD;
+	GPIO_Init(GPIOC, &GPIO_InitStruct);
+	
+	GPIO_EXTILineConfig(GPIO_PortSourceGPIOC, GPIO_PinsSource13);
+  GPIO_EXTILineConfig(GPIO_PortSourceGPIOC, GPIO_PinsSource14);
+	
+	EXTI_InitStruct.EXTI_Line = EXTI_Line13;
+	EXTI_InitStruct.EXTI_Mode = EXTI_Mode_Interrupt;
+	EXTI_InitStruct.EXTI_Trigger = EXTI_Trigger_Rising_Falling;
+	EXTI_InitStruct.EXTI_LineEnable = ENABLE;
+	EXTI_Init(&EXTI_InitStruct);
+  EXTI_InitStruct.EXTI_Line = EXTI_Line14;
+	EXTI_InitStruct.EXTI_Mode = EXTI_Mode_Interrupt;
+	EXTI_InitStruct.EXTI_Trigger = EXTI_Trigger_Rising_Falling;
+	EXTI_InitStruct.EXTI_LineEnable = ENABLE;
+	EXTI_Init(&EXTI_InitStruct);
+	
+  NVIC_SetPriority(EXTI15_10_IRQn, 0);
+  NVIC_EnableIRQ(EXTI15_10_IRQn);
+}
+#endif // CONTROL_PWM
+
 /*
 void UART_Init() {
   __HAL_RCC_USART2_CLK_ENABLE();
@@ -607,7 +655,7 @@ void MX_ADC1_Init(void) {
   DMA_INTConfig(DMA1_Channel1, DMA_INT_TC, ENABLE);
   DMA_ChannelEnable(DMA1_Channel1, ENABLE);
 
-  NVIC_SetPriority(DMA1_Channel1_IRQn, 0);
+  NVIC_SetPriority(DMA1_Channel1_IRQn, 1);
   NVIC_EnableIRQ(DMA1_Channel1_IRQn);
 }
 

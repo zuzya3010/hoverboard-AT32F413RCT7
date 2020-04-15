@@ -24,6 +24,24 @@ DMA_HandleTypeDef hdma_i2c2_rx;
 DMA_HandleTypeDef hdma_i2c2_tx;
 #endif // CONTROL_NUNCHUCK
 
+#ifdef CONTROL_PWM
+// Maximum number of PWM channels this code supports, may not be the actual
+// number of PWM channels in use
+#define MAX_PWM_CHANNELS 8
+// Minimum pulse length in microsecond, pulses shorter than this are ignored
+#define MIN_PULSE_LENGTH 750
+// Maximum pulse length in microsecond, pulses longer than this are ignored
+#define MAX_PULSE_LENGTH 2250
+
+static uint32_t last_activity_timestamp[MAX_PWM_CHANNELS];
+static bool last_activity_timestamp_valid[MAX_PWM_CHANNELS];
+static uint32_t pulse_start_timestamp[MAX_PWM_CHANNELS];
+static bool pulse_started[MAX_PWM_CHANNELS];
+static bool rc_dead = true;
+
+uint16_t pwm_channel[MAX_PWM_CHANNELS];
+#endif // CONTROL_PWM
+
 #ifdef CONTROL_PPM
 uint16_t ppm_captured_value[PPM_NUM_CHANNELS + 1] = {500, 500};
 uint16_t ppm_captured_value_buffer[PPM_NUM_CHANNELS+1] = {500, 500};
@@ -131,6 +149,76 @@ void PPM_Init() {
   HAL_TIM_Base_Start(&TimHandleTim3);
 }
 #endif // CONTROL_PPM
+
+#ifdef CONTROL_PWM
+void PWM_EXTI_Callback(unsigned int channel, unsigned int level) {
+  uint32_t current_timestamp = TMR_GetCounter(TMR2); // in microseconds
+  if (channel < MAX_PWM_CHANNELS) {
+
+    if (rc_dead) {
+      // Got RC signal back (or it just started), initialise everything
+      for (int i = 0; i < MAX_PWM_CHANNELS; i++) {
+        pwm_channel[i] = PWM_CENTER;
+        pulse_started[i] = false;
+        last_activity_timestamp_valid[i] = false;
+      }
+    }
+
+    if (level) {
+      // Start of pulse
+      pulse_start_timestamp[channel] = current_timestamp;
+      pulse_started[channel] = true;
+    } else {
+      if (pulse_started[channel]) {
+        // End of pulse
+        uint32_t pulse_length = current_timestamp - pulse_start_timestamp[channel];
+        // Only accept pulse if it isn't too short or too long. Pulses outside
+        // the acceptable range are probably glitches due to noise.
+        // Don't write PWM_CENTER to pwm_channel for invalid pulses
+        // because it's probably just a temporary glitch.
+        if ((pulse_length >= MIN_PULSE_LENGTH) && (pulse_length <= MAX_PULSE_LENGTH)) {
+          pwm_channel[channel] = pulse_length;
+        }
+        pulse_started[channel] = false;
+      }
+    }
+    last_activity_timestamp_valid[channel] = true;
+    last_activity_timestamp[channel] = current_timestamp;
+    rc_dead = false;
+  }
+}
+
+// You must call this before reading from pwm_channel, to check for validity.
+// Returns true if pwm_channel values are valid,
+// returns false if RC is dead.
+bool PWM_Read() {
+  uint32_t current_timestamp = TMR_GetCounter(TMR2); // in microseconds
+
+  if (!rc_dead) {
+    // Check if all channels have died, this indicates dead RC
+    rc_dead = true; // will become false if any channel has activity
+    for (int i = 0; i < MAX_PWM_CHANNELS; i++) {
+      if (last_activity_timestamp_valid[i]
+        && ((current_timestamp - last_activity_timestamp[i]) <= (PWM_TIMEOUT * 1000UL))) {
+        rc_dead = false;
+        break;
+      }
+    }
+    // Check for pulse timeout on individual channels
+    for (int i = 0; i < MAX_PWM_CHANNELS; i++) {
+      if (last_activity_timestamp_valid[i]
+        && ((current_timestamp - last_activity_timestamp[i]) > (PWM_TIMEOUT * 1000UL))) {
+        // Channel is stuck, maybe a connection came loose?
+        // For safety, set channel pulse length to center.
+        pwm_channel[i] = PWM_CENTER;
+        pulse_started[i] = false;
+        last_activity_timestamp_valid[i] = false;
+      }
+    }
+  }
+  return !rc_dead;
+}
+#endif // CONTROL_PWM
 
 #ifdef CONTROL_NUNCHUCK
 void Nunchuck_Init() {

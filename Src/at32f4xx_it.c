@@ -12,6 +12,7 @@
 #include "at32f4xx_it.h"
 #include "config.h"
 #include "setup.h"
+#include "control.h"
 
 #ifdef CONTROL_NUNCHUCK
 	extern DMA_HandleTypeDef hdma_i2c2_rx;
@@ -194,5 +195,24 @@ void DMA1_Channel7_IRQHandler(void)
   /* USER CODE BEGIN DMA1_Channel5_IRQn 1 */
 
   /* USER CODE END DMA1_Channel5_IRQn 1 */
+}
+#endif
+
+#ifdef CONTROL_PWM
+/**
+* @brief This function handles EXTI channel 10 to 15 interrupts.
+*/
+void EXTI15_10_IRQHandler(void)
+{
+  if (EXTI_GetIntStatus(EXTI_Line13) != RESET)
+  {
+    EXTI_ClearIntPendingBit(EXTI_Line13);
+    PWM_EXTI_Callback(0, GPIO_ReadInputDataBit(GPIOC, GPIO_Pins_13));
+  }
+  if (EXTI_GetIntStatus(EXTI_Line14) != RESET)
+  {
+    EXTI_ClearIntPendingBit(EXTI_Line14);
+    PWM_EXTI_Callback(1, GPIO_ReadInputDataBit(GPIOC, GPIO_Pins_14));
+  }
 }
 #endif

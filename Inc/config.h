@@ -64,7 +64,7 @@
 
 // ############################### INPUT ###############################
 
-#define CONTROL_MOTOR_TEST
+//#define CONTROL_MOTOR_TEST
 //#define CONTROL_DETECT_HALL
 
 // ###### CONTROL VIA UART (serial) ######
@@ -77,6 +77,10 @@
 //#define CONTROL_PPM                 // use PPM-Sum as input. disable CONTROL_SERIAL_USART2!
 //#define PPM_NUM_CHANNELS 8          // total number of PPM channels to receive, even if they are not used.
 //#define PPM_DEAD_BAND 5			// dead band around 500
+#define CONTROL_PWM                 // Use PWM as input
+#define PWM_TIMEOUT 200             // timeout in milliseconds for detecting dead RC
+#define PWM_CENTER 1500             // PWM center pulse length in microseconds
+#define PWM_DEAD_BAND 25            // dead band in microseconds
 
 // ###### CONTROL VIA TWO POTENTIOMETERS ######
 // ADC-calibration to cover the full poti-range: connect potis to left sensor board cable (0 to 3.3V) (do NOT use the red 15V wire in the cable!). see <How to calibrate>. turn the potis to minimum position, write value 1 to ADC1_MIN and value 2 to ADC2_MIN. turn to maximum position and repeat it for ADC?_MAX. make, flash and test it.
