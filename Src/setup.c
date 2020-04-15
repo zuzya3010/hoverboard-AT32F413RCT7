@@ -150,34 +150,47 @@ void UART_Init() {
 
 #ifdef DEBUG_SERIAL_USART2
 void UART_Init() {
-  __HAL_RCC_USART2_CLK_ENABLE();
-  __HAL_RCC_DMA1_CLK_ENABLE();
+  GPIO_InitType GPIO_InitStruct = {0};
+  USART_InitType USART_InitStruct = {0};
+  DMA_InitType DMA_InitStructure = {0};
 
-  UART_HandleTypeDef huart2;
-  huart2.Instance          = USART2;
-  huart2.Init.BaudRate     = DEBUG_BAUD;
-  huart2.Init.WordLength   = UART_WORDLENGTH_8B;
-  huart2.Init.StopBits     = UART_STOPBITS_1;
-  huart2.Init.Parity       = UART_PARITY_NONE;
-  huart2.Init.Mode         = UART_MODE_TX;
-  huart2.Init.HwFlowCtl    = UART_HWCONTROL_NONE;
-  huart2.Init.OverSampling = UART_OVERSAMPLING_16;
-  HAL_UART_Init(&huart2);
+  RCC_APB1PeriphClockCmd(RCC_APB1PERIPH_USART2, ENABLE);
+  RCC_APB2PeriphClockCmd(RCC_APB2PERIPH_GPIOA, ENABLE);
+  RCC_AHBPeriphClockCmd(RCC_AHBPERIPH_DMA1, ENABLE);
 
-  USART2->CR3 |= USART_CR3_DMAT;  // | USART_CR3_DMAR | USART_CR3_OVRDIS;
+  USART_StructInit(&USART_InitStruct);
+  USART_InitStruct.USART_BaudRate = DEBUG_BAUD;
+  USART_InitStruct.USART_WordLength = USART_WordLength_8b;
+  USART_InitStruct.USART_StopBits = USART_StopBits_1;
+  USART_InitStruct.USART_Parity = USART_Parity_No;
+  USART_InitStruct.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
+  USART_InitStruct.USART_Mode = USART_Mode_Tx;
+  USART_OverSampling8Cmd(USART2, DISABLE);
+  USART_OneBitMethodCmd(USART2, DISABLE);
+  USART_Init(USART2, &USART_InitStruct);
 
-  GPIO_InitTypeDef GPIO_InitStruct;
-  GPIO_InitStruct.Pin   = GPIO_PIN_2;
-  GPIO_InitStruct.Pull  = GPIO_PULLUP;
-  GPIO_InitStruct.Mode  = GPIO_MODE_AF_PP;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+  USART_DMACmd(USART2, USART_DMAReq_Tx, ENABLE);
+  USART_Cmd(USART2, ENABLE);
 
-  DMA1_Channel7->CCR   = 0;
-  DMA1_Channel7->CPAR  = (uint32_t) & (USART2->DR);
-  DMA1_Channel7->CNDTR = 0;
-  DMA1_Channel7->CCR   = DMA_CCR_MINC | DMA_CCR_DIR;
-  DMA1->IFCR           = DMA_IFCR_CTCIF7 | DMA_IFCR_CHTIF7 | DMA_IFCR_CGIF7;
+  GPIO_InitStruct.GPIO_Pins = GPIO_Pins_2;
+  GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF_PP;
+  GPIO_InitStruct.GPIO_MaxSpeed = GPIO_MaxSpeed_10MHz;
+  GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  DMA_Reset(DMA1_Channel7);
+  DMA_DefaultInitParaConfig(&DMA_InitStructure);
+  DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t)&(USART2->DT);
+  DMA_InitStructure.DMA_MemoryBaseAddr = 0;
+  DMA_InitStructure.DMA_Direction = DMA_DIR_PERIPHERALDST;
+  DMA_InitStructure.DMA_BufferSize = 0;
+  DMA_InitStructure.DMA_PeripheralInc = DMA_PERIPHERALINC_DISABLE;
+  DMA_InitStructure.DMA_MemoryInc = DMA_MEMORYINC_ENABLE;
+  DMA_InitStructure.DMA_PeripheralDataWidth = DMA_PERIPHERALDATAWIDTH_BYTE;
+  DMA_InitStructure.DMA_MemoryDataWidth = DMA_PERIPHERALDATAWIDTH_BYTE;
+  DMA_InitStructure.DMA_Mode = DMA_MODE_NORMAL;
+  DMA_InitStructure.DMA_Priority = DMA_PRIORITY_HIGH;
+  DMA_InitStructure.DMA_MTOM = DMA_MEMTOMEM_DISABLE;
+  DMA_Init(DMA1_Channel7, &DMA_InitStructure);
 }
 #endif
 
